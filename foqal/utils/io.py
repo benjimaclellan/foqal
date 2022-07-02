@@ -49,7 +49,7 @@ class IO:
         return
 
     @classmethod
-    def create_new_save_folder(
+    def directory(
         cls, path=None, folder="", include_date=False, include_uuid=False, verbose=True
     ):
         """

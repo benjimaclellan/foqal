@@ -2,7 +2,6 @@ from foqal.model import ModelBase
 
 
 class GeneralizedProbabilityTheory(ModelBase):
-
     def __init__(self, num_states: int, num_effects: int, rank: int, **kwargs):
         """
 

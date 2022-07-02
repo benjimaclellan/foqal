@@ -9,7 +9,6 @@ from foqal.fit import fit
 
 
 class ClassicalProbabilityCausalModel(ModelBase):
-
     def __init__(self, num_settings: int, latent_dim: int, **kwargs):
         """
 
@@ -21,7 +20,6 @@ class ClassicalProbabilityCausalModel(ModelBase):
 
 
 class ClassicalCommonCause(ClassicalProbabilityCausalModel):
-
     def __init__(self, num_settings: int, latent_dim: int, **kwargs):
         super().__init__(num_settings, latent_dim, **kwargs)
 
@@ -66,7 +64,6 @@ class ClassicalCommonCause(ClassicalProbabilityCausalModel):
 
 
 class Superdeterminism(ClassicalProbabilityCausalModel):
-
     def __init__(self, num_settings: int, latent_dim: int, **kwargs):
         super().__init__(num_settings, latent_dim, **kwargs)
 
@@ -101,8 +98,9 @@ class Superdeterminism(ClassicalProbabilityCausalModel):
             "P(Y|TL)": torch.stack(
                 [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
             ),
-            "P(S|L)": self.params["P(S|L)"]
-            / torch.sum(self.params["P(S|L)"], dim=0)[None, :],
+            "P(S|L)": (
+                self.params["P(S|L)"] / torch.sum(self.params["P(S|L)"], dim=0)[None, :]
+            ),
             "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
         }
 
@@ -125,7 +123,6 @@ class Superdeterminism(ClassicalProbabilityCausalModel):
 
 
 class Superluminal(ClassicalProbabilityCausalModel):
-
     def __init__(self, num_settings: int, latent_dim: int, **kwargs):
         super().__init__(num_settings, latent_dim, **kwargs)
 
@@ -177,14 +174,14 @@ if __name__ == "__main__":
     print(f"Current device: {torch.cuda.get_device_name(0)}")
     device = torch.cuda.current_device()
 
-    io = IO.create_new_save_folder(
+    io = IO.directory(
         folder="entangled-state-data", include_date=False, include_uuid=False
     )
 
     run = 0
-    m = 10
+    m = 100
     p = 0.0
-    latent_dim = 10
+    latent_dim = 100
 
     data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{run}.npy"))
     if use_device:

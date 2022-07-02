@@ -2,13 +2,13 @@ import tqdm
 from torch.functional import F
 
 
-def fit(model, data, optimizer, n_steps=1000):
+def fit(model, data, optimizer, n_steps=1000, progress=True):
     """
     Training loop for torch model.
     """
 
     losses = []
-    for step in (pbar := tqdm.tqdm(range(n_steps))):
+    for step in (pbar := tqdm.tqdm(range(n_steps), disable=(not progress))):
 
         pred = model.forward()
         loss = F.mse_loss(pred, data)
@@ -23,6 +23,7 @@ def fit(model, data, optimizer, n_steps=1000):
         else:
             losses.append(loss.detach().numpy())
 
-        pbar.set_description(f"Cost: {losses[-1]:.4f}")
+        if progress:
+            pbar.set_description(f"Cost: {losses[-1]:.4f}")
 
     return losses
