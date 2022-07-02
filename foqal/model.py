@@ -51,3 +51,13 @@ class ModelBase(nn.Module):
                 self.params[key][:] = torch.clamp(
                     self.params[key], min=term["bounds"][0], max=term["bounds"][1]
                 )
+
+    def initialize_params(self):
+        self.params = nn.ParameterDict()
+
+        for key, term in self.terms.items():
+            self.params[key] = nn.Parameter(
+                torch.distributions.Uniform(
+                    low=term["bounds"][0], high=term["bounds"][1]
+                ).sample(term["shape"])
+            )
