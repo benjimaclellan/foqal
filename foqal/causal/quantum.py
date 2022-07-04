@@ -42,7 +42,9 @@ class QuantumCommonCause(ModelBase):
         }
 
         self.initialize_params()
-        self.identity = nn.Parameter(torch.eye(self.latent_dim)[None, :, :], requires_grad=False)
+        self.identity = nn.Parameter(
+            torch.eye(self.latent_dim)[None, :, :], requires_grad=False
+        )
         return
 
     @staticmethod
@@ -59,7 +61,7 @@ class QuantumCommonCause(ModelBase):
         return rho
 
     def forward(self):
-        # self.clip_params()
+        self.clip_params()
 
         ex = self.density_operators(self.params["E(X=0|S)"])
         ey = self.density_operators(self.params["E(Y=0|T)"])
@@ -69,8 +71,7 @@ class QuantumCommonCause(ModelBase):
             "E(Y|T)": torch.stack([ey, self.identity - ey], dim=0),
             "rho(AB)": self.density_operators(self.params["rho(AB)"]),
         }
-        # print(t)
-        # print("E(X|S) shape", t["E(X|S)"].shape)
+
         out_shape = [
             2,
             2,
@@ -81,7 +82,10 @@ class QuantumCommonCause(ModelBase):
         ]
 
         # Kronecker product of all measurement outcomes, XY
-        e = torch.reshape(torch.einsum("xsik,ytjl->xystijkl", t["E(X|S)"], t["E(Y|T)"]), shape=out_shape)
+        e = torch.reshape(
+            torch.einsum("xsik,ytjl->xystijkl", t["E(X|S)"], t["E(Y|T)"]),
+            shape=out_shape,
+        )
 
         # matrix multiplication of [E(X|S) \otimes E(Y|T)] @ rho(AB)
         out = torch.einsum("xystij,qjk->xystik", e, t["rho(AB)"])
@@ -103,8 +107,8 @@ if __name__ == "__main__":
     )
 
     run = 0
-    m = 30
-    p = 0.0
+    m = 70
+    p = 0.8
     latent_dim = 2
 
     data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{run}.npy"))
