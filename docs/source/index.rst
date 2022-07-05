@@ -14,7 +14,7 @@ Welcome to Foqal's documentation!
    :caption: Tutorials
 
    tutorial
-   _examples/Tutorial1_CausalModels.ipynb
+   tutorials/Tutorial1_CausalModels.ipynb
 
 
 .. toctree::
@@ -22,6 +22,7 @@ Welcome to Foqal's documentation!
    :caption: API Reference
 
    causal
+   gpt
 
 Indices and tables
 ==================

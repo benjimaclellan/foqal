@@ -133,3 +133,7 @@ data/
 scratch/
 
 .idea/
+
+.figures/
+
+analysis/

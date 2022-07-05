@@ -26,9 +26,9 @@ states = {
 """ Common quantum state models """
 
 
-def depolarized(p, state=states['phi+']):
+def depolarized(p, state=states["phi+"]):
     identity = qt.identity(dims=[2, 2])
-    rho_prime = (1-p) * qt.ket2dm(state) + p * identity / 4
+    rho_prime = (1 - p) * qt.ket2dm(state) + p * identity / 4
     return rho_prime
 
 

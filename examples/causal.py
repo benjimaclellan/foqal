@@ -24,14 +24,14 @@ if __name__ == "__main__":
     io = IO.directory(
         folder="entangled-state-data", include_date=False, include_uuid=False, verbose=False,
     )
-    
+
     # ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
     ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,)
     ms = (70,)
 
     latent_dim = 30
-    lr = 0.05
-    n_steps = 300
+    lr = 0.25
+    n_steps = 1000
 
     q = list(itertools.product(ms, ps))
 
@@ -63,7 +63,7 @@ if __name__ == "__main__":
             if use_device:
                 model = model.to(device)
 
-            optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+            optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
 
             t0 = time.time()
             losses = fit(model, train_data, optimizer, n_steps=n_steps, progress=False)

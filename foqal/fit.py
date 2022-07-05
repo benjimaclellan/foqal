@@ -2,6 +2,10 @@ import tqdm
 from torch.functional import F
 
 
+def loss_function(pred, data):
+    return F.mse_loss(pred, data)
+
+
 def fit(model, data, optimizer, n_steps=1000, progress=True):
     """
     Training loop for torch model.
@@ -11,7 +15,7 @@ def fit(model, data, optimizer, n_steps=1000, progress=True):
     for step in (pbar := tqdm.tqdm(range(n_steps), disable=(not progress))):
 
         pred = model.forward()
-        loss = F.mse_loss(pred, data)
+        loss = loss_function(pred, data)
 
         loss.backward()
 

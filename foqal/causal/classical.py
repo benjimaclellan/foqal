@@ -9,6 +9,7 @@ from foqal.fit import fit
 
 
 class ClassicalProbabilityCausalModel(ModelBase):
+
     def __init__(self, num_settings: int, latent_dim: int, **kwargs):
         """
 
@@ -20,6 +21,14 @@ class ClassicalProbabilityCausalModel(ModelBase):
 
 
 class ClassicalCommonCause(ClassicalProbabilityCausalModel):
+    """
+    A local hidden-variable model.
+
+    :math:`P_{XY|ST} = \\sum_{\\lambda \in \\Lambda} P_{X|S\\lambda} P_{Y|T\\lambda} P_{\\lambda}`
+
+    Has a total of
+    :math:`|\\Lambda | m^2`
+    """
     def __init__(self, num_settings: int, latent_dim: int, **kwargs):
         super().__init__(num_settings, latent_dim, **kwargs)
 
@@ -199,7 +208,7 @@ if __name__ == "__main__":
         if use_device:
             model = model.to(device)
 
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.05)
+        optimizer = torch.optim.Adagrad(model.parameters(), lr=0.5)
 
         t0 = time.time()
         losses = fit(model, data, optimizer, n_steps=400)
