@@ -9,9 +9,9 @@ from foqal.utils.constants import states, channels
 
 
 def simulate_quantum_states_effects(
-    num_datasets=2,
-    num_states: int = 10,
-    num_effects: int = 10,
+    n_datasets=2,
+    n_states: int = 10,
+    n_effects: int = 10,
     n_parties: int = 1,
     dim: int = 2,
     method: str = "haar",
@@ -23,10 +23,10 @@ def simulate_quantum_states_effects(
 
     if method in ("fibonnaci", "spiral"):
         _states = bloch_vectors_to_kets(
-            distribute_points_on_sphere(num_samples=num_states, method=method)
+            distribute_points_on_sphere(num_samples=n_states, method=method)
         )
         _effects = bloch_vectors_to_kets(
-            distribute_points_on_sphere(num_samples=num_effects, method=method)
+            distribute_points_on_sphere(num_samples=n_effects, method=method)
         )
 
         states = [qt.tensor(*s) for s in itertools.product(_states, repeat=n_parties)]
@@ -38,19 +38,17 @@ def simulate_quantum_states_effects(
             n_parties * [dim],
             n_parties * [1],
         ]
-        states = [qt.rand_ket(dim**n_parties, dims=_dims) for _ in range(num_states)]
-        effects = [
-            qt.rand_ket(dim**n_parties, dims=_dims) for _ in range(num_effects)
-        ]
+        states = [qt.rand_ket(dim**n_parties, dims=_dims) for _ in range(n_states)]
+        effects = [qt.rand_ket(dim**n_parties, dims=_dims) for _ in range(n_effects)]
 
-    data = np.zeros([num_states, num_effects])
+    data = np.zeros([n_states, n_effects])
     for i, state in enumerate(states):
         for j, effect in enumerate(effects):
             data[i, j] = np.abs(np.squeeze((state.dag() * effect).full())) ** 2
 
     datasets = []
     total_counts = 300
-    for j in range(num_datasets):
+    for j in range(n_datasets):
         # _data = np.random.poisson(total_counts * data) / total_counts
         _data = np.random.normal(data, scale=0.1)
         datasets.append(_data)
@@ -84,9 +82,9 @@ if __name__ == "__main__":
             )
 
             datasets = simulate_quantum_states_effects(
-                num_datasets=2,
-                num_states=num_states,
-                num_effects=num_effects,
+                n_datasets=2,
+                n_states=num_states,
+                n_effects=num_effects,
                 method="haar",
                 n_parties=n_parties,
                 dim=dim,

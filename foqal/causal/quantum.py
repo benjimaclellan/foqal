@@ -10,10 +10,21 @@ from foqal.fit import fit
 
 
 class QuantumCommonCause(ModelBase):
-    def __init__(self, num_settings: int, latent_dim: int, **kwargs):
+    """
+    The quantum common cause model is a parametrically radical, but structurally conservative model.
+
+    .math
+    {
+    text-align:center;
+    }
+    :math:`P_{XY|ST} = \\text{Tr} \\left[ (E_{X|S} \\otimes E_{Y|T}) \\ \\rho_{AB}  \\right]`
+
+    """
+
+    def __init__(self, n_settings: int, latent_dim: int, **kwargs):
         super().__init__(**kwargs)
 
-        self.num_settings = num_settings
+        self.n_settings = n_settings
 
         if latent_dim > 4:
             raise UserWarning(
@@ -28,11 +39,11 @@ class QuantumCommonCause(ModelBase):
 
         self.terms = {
             "E(X=0|S)": dict(
-                shape=(self.num_settings, self.latent_dim, self.latent_dim),
+                shape=(self.n_settings, self.latent_dim, self.latent_dim),
                 bounds=(-1, 1),
             ),
             "E(Y=0|T)": dict(
-                shape=(self.num_settings, self.latent_dim, self.latent_dim),
+                shape=(self.n_settings, self.latent_dim, self.latent_dim),
                 bounds=(-1, 1),
             ),
             "rho(AB)": dict(
@@ -75,8 +86,8 @@ class QuantumCommonCause(ModelBase):
         out_shape = [
             2,
             2,
-            self.num_settings,
-            self.num_settings,
+            self.n_settings,
+            self.n_settings,
             self.latent_dim**2,
             self.latent_dim**2,
         ]
@@ -117,7 +128,7 @@ if __name__ == "__main__":
 
     training_curves = {}
 
-    model = QuantumCommonCause(num_settings=m, latent_dim=latent_dim)
+    model = QuantumCommonCause(n_settings=m, latent_dim=latent_dim)
 
     if use_device:
         model = model.to(device)

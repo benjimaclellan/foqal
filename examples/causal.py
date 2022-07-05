@@ -27,11 +27,11 @@ if __name__ == "__main__":
 
     # ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
     ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,)
-    ms = (70,)
+    ms = (10,)
 
-    latent_dim = 30
+    latent_dim = 100
     lr = 0.25
-    n_steps = 1000
+    n_steps = 300
 
     q = list(itertools.product(ms, ps))
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
             else:
                 _latent_dim = latent_dim
 
-            model = Model(num_settings=m, latent_dim=_latent_dim)
+            model = Model(n_settings=m, latent_dim=_latent_dim)
 
             if use_device:
                 model = model.to(device)
@@ -66,7 +66,7 @@ if __name__ == "__main__":
             optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
 
             t0 = time.time()
-            losses = fit(model, train_data, optimizer, n_steps=n_steps, progress=False)
+            losses = fit(model, train_data, optimizer, n_steps=n_steps, progress=True)
             t1 = time.time()
 
             if verbose:
@@ -100,4 +100,8 @@ if __name__ == "__main__":
 
     io.verbose = True
     df = pd.DataFrame(df)
+
+    io = IO.directory(
+        folder=f"entangled-state-data-{m}", include_date=False, include_uuid=False, verbose=True,
+    )
     io.save_dataframe(df, filename="summary_of_fitting.txt")

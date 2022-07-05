@@ -9,14 +9,17 @@ from foqal.fit import fit
 
 
 class ClassicalProbabilityCausalModel(ModelBase):
+    """
+    Base model for all classical probabilistic (i.e., parametrically conservative) models.
+    """
 
-    def __init__(self, num_settings: int, latent_dim: int, **kwargs):
+    def __init__(self, n_settings: int, latent_dim: int, **kwargs):
         """
 
         :param kwargs:
         """
         super().__init__(**kwargs)
-        self.num_settings = num_settings
+        self.n_settings = n_settings
         self.latent_dim = latent_dim
 
 
@@ -24,21 +27,28 @@ class ClassicalCommonCause(ClassicalProbabilityCausalModel):
     """
     A local hidden-variable model.
 
+    This model is both parameterically and structurally conservative.
+
+    The joint probability of measurement outcomes X and Y is given by,
     :math:`P_{XY|ST} = \\sum_{\\lambda \in \\Lambda} P_{X|S\\lambda} P_{Y|T\\lambda} P_{\\lambda}`
+
+    See Daley et al. for more details:
+    https://journals.aps.org/pra/abstract/10.1103/PhysRevA.105.042220
 
     Has a total of
     :math:`|\\Lambda | m^2`
     """
-    def __init__(self, num_settings: int, latent_dim: int, **kwargs):
-        super().__init__(num_settings, latent_dim, **kwargs)
+
+    def __init__(self, n_settings: int, latent_dim: int, **kwargs):
+        super().__init__(n_settings, latent_dim, **kwargs)
 
         self.terms = {
             "P(X=0|SL)": dict(
-                shape=(self.num_settings, self.latent_dim),
+                shape=(self.n_settings, self.latent_dim),
                 bounds=(0, 1),
             ),
             "P(Y=0|TL)": dict(
-                shape=(self.num_settings, self.latent_dim),
+                shape=(self.n_settings, self.latent_dim),
                 bounds=(0, 1),
             ),
             "P(L)": dict(
@@ -73,20 +83,20 @@ class ClassicalCommonCause(ClassicalProbabilityCausalModel):
 
 
 class Superdeterminism(ClassicalProbabilityCausalModel):
-    def __init__(self, num_settings: int, latent_dim: int, **kwargs):
-        super().__init__(num_settings, latent_dim, **kwargs)
+    def __init__(self, n_settings: int, latent_dim: int, **kwargs):
+        super().__init__(n_settings, latent_dim, **kwargs)
 
         self.terms = {
             "P(X=0|SL)": dict(
-                shape=(num_settings, latent_dim),
+                shape=(n_settings, latent_dim),
                 bounds=(0, 1),
             ),
             "P(Y=0|TL)": dict(
-                shape=(num_settings, latent_dim),
+                shape=(n_settings, latent_dim),
                 bounds=(0, 1),
             ),
             "P(S|L)": dict(
-                shape=(num_settings, latent_dim),
+                shape=(n_settings, latent_dim),
                 bounds=(0, 1),
             ),
             "P(L)": dict(
@@ -132,16 +142,16 @@ class Superdeterminism(ClassicalProbabilityCausalModel):
 
 
 class Superluminal(ClassicalProbabilityCausalModel):
-    def __init__(self, num_settings: int, latent_dim: int, **kwargs):
-        super().__init__(num_settings, latent_dim, **kwargs)
+    def __init__(self, n_settings: int, latent_dim: int, **kwargs):
+        super().__init__(n_settings, latent_dim, **kwargs)
 
         self.terms = {
             "P(X=0|STL)": dict(
-                shape=(num_settings, num_settings, latent_dim),
+                shape=(n_settings, n_settings, latent_dim),
                 bounds=(0, 1),
             ),
             "P(Y=0|TL)": dict(
-                shape=(num_settings, latent_dim),
+                shape=(n_settings, latent_dim),
                 bounds=(0, 1),
             ),
             "P(L)": dict(
@@ -203,7 +213,7 @@ if __name__ == "__main__":
         Superdeterminism,
         Superluminal,
     ]:
-        model = Model(num_settings=m, latent_dim=latent_dim)
+        model = Model(n_settings=m, latent_dim=latent_dim)
 
         if use_device:
             model = model.to(device)

@@ -10,23 +10,31 @@ from foqal.utils.io import IO
 
 
 class GeneralizedProbabilityTheory(ModelBase):
-    def __init__(self, num_states: int, num_effects: int, rank: int, **kwargs):
+    """
+    A generalized probabilistic theory (GPT) is a general framework to describe the operational features of
+    arbitrary physical theories.
+
+    The model implemented here is based off of the approach in,
+
+    """
+
+    def __init__(self, n_states: int, n_effects: int, rank: int, **kwargs):
         """
 
         :param kwargs:
         """
         super().__init__(**kwargs)
-        self.num_states = num_states
-        self.num_effects = num_effects
+        self.n_states = n_states
+        self.n_effects = n_effects
         self.rank = rank
 
         self.terms = {
             "S": dict(
-                shape=(self.num_states, self.rank),
+                shape=(self.n_states, self.rank),
                 bounds=(-1, 1),
             ),
             "E": dict(
-                shape=(self.rank, self.num_effects),
+                shape=(self.rank, self.n_effects),
                 bounds=(-1, 1),
             ),
         }
@@ -51,19 +59,19 @@ if __name__ == "__main__":
     io = IO.directory(
         folder="gpt-generated-data", include_date=False, include_uuid=False
     )
-    num_states, num_effects = 100, 100
+    n_states, n_effects = 100, 100
     n_parties = 1
     dim = 5
     ranks = range(1, 50, 1)
 
     train_data = torch.Tensor(
         io.load_np_array(
-            filename=f"dim={dim}_n_parties={n_parties}_num_states={num_states}_num_effects={num_effects}_run{0}.npy"
+            filename=f"dim={dim}_n_parties={n_parties}_num_states={n_states}_num_effects={n_effects}_run{0}.npy"
         )
     )
     test_data = torch.Tensor(
         io.load_np_array(
-            filename=f"dim={dim}_n_parties={n_parties}_num_states={num_states}_num_effects={num_effects}_run{1}.npy"
+            filename=f"dim={dim}_n_parties={n_parties}_num_states={n_states}_num_effects={n_effects}_run{1}.npy"
         )
     )
     if use_device:
@@ -77,7 +85,7 @@ if __name__ == "__main__":
 
     for rank in ranks:
         model = GeneralizedProbabilityTheory(
-            num_states=num_states, num_effects=num_effects, rank=rank
+            n_states=n_states, n_effects=n_effects, rank=rank
         )
 
         if use_device:

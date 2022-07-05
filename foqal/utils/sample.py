@@ -34,6 +34,9 @@ def distribute_points_on_sphere(num_samples: int = 1000, method: str = "spiral")
     """
 
     if method == "spiral":
+        raise ValueError(
+            "Spiral sampling method not implemented currently (needs more testing)."
+        )
         N = num_samples
         C = 3.6
 
