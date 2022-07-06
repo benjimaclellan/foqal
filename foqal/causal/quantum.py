@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from foqal.model import ModelBase
-from foqal.utils.io import IO
+from foqal.io import IO
 from foqal.fit import fit
 
 

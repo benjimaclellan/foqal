@@ -1,7 +1,7 @@
 import qutip as qt
 import numpy as np
 
-from foqal.utils.io import IO
+from foqal.io import IO
 from foqal.utils.sample import distribute_points_on_sphere, bloch_vectors_to_kets
 from foqal.utils.constants import channels
 

@@ -1,17 +1,10 @@
-import time
-import itertools
-import tqdm
 import pandas as pd
 import torch
-from torch.functional import F
-import numpy as np
-import matplotlib.pyplot as plt
 
-
-from foqal.utils.io import IO
+from foqal.io import IO
 from foqal.causal.classical import ClassicalCommonCause, Superdeterminism, Superluminal
 from foqal.causal.quantum import QuantumCommonCause
-from foqal.fit import fit, kfold_validation
+from foqal.fit import cross_validation
 
 
 if __name__ == "__main__":
@@ -55,7 +48,7 @@ if __name__ == "__main__":
             model = Model(n_settings=m, latent_dim=_latent_dim).to(device)
             optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
 
-            results = kfold_validation(model, datasets=datasets, optimizer=optimizer, n_steps=n_steps)
+            results = cross_validation(model, datasets=datasets, optimizer=optimizer, n_steps=n_steps)
 
             df.append(dict(
                 model=model.__class__.__name__,

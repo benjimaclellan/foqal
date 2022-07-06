@@ -4,11 +4,8 @@ import tqdm
 import pandas as pd
 import torch
 from torch.functional import F
-import numpy as np
-import matplotlib.pyplot as plt
 
-
-from foqal.utils.io import IO
+from foqal.io import IO
 from foqal.causal.classical import ClassicalCommonCause, Superdeterminism, Superluminal
 from foqal.causal.quantum import QuantumCommonCause
 from foqal.fit import fit

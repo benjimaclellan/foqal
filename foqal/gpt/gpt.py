@@ -6,7 +6,7 @@ import time
 from foqal.fit import fit, loss_function
 
 from foqal.model import ModelBase
-from foqal.utils.io import IO
+from foqal.io import IO
 
 
 class GeneralizedProbabilityTheory(ModelBase):

@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from foqal.model import ModelBase
-from foqal.utils.io import IO
-from foqal.fit import fit
+from foqal.io import IO
+from foqal.fit import fit, to_numpy
 
 
 class ClassicalProbabilityCausalModel(ModelBase):
@@ -21,6 +21,8 @@ class ClassicalProbabilityCausalModel(ModelBase):
         super().__init__(**kwargs)
         self.n_settings = n_settings
         self.latent_dim = latent_dim
+        # self.prob_bounds = (1e-14, 1.0)  # TODO: may be necessary for KL divergence to avoid instability
+        self.prob_bounds = (0.0, 1.0)
 
 
 class ClassicalCommonCause(ClassicalProbabilityCausalModel):
@@ -46,15 +48,15 @@ class ClassicalCommonCause(ClassicalProbabilityCausalModel):
         self.terms = {
             "P(X=0|SL)": dict(
                 shape=(self.n_settings, self.latent_dim),
-                bounds=(0, 1),
+                bounds=self.prob_bounds,
             ),
             "P(Y=0|TL)": dict(
                 shape=(self.n_settings, self.latent_dim),
-                bounds=(0, 1),
+                bounds=self.prob_bounds,
             ),
             "P(L)": dict(
                 shape=(self.latent_dim,),
-                bounds=[0, 1],
+                bounds=self.prob_bounds,
             ),
         }
 
@@ -100,19 +102,19 @@ class Superdeterminism(ClassicalProbabilityCausalModel):
         self.terms = {
             "P(X=0|SL)": dict(
                 shape=(n_settings, latent_dim),
-                bounds=(0, 1),
+                bounds=self.prob_bounds,
             ),
             "P(Y=0|TL)": dict(
                 shape=(n_settings, latent_dim),
-                bounds=(0, 1),
+                bounds=self.prob_bounds,
             ),
             "P(S|L)": dict(
                 shape=(n_settings, latent_dim),
-                bounds=(0, 1),
+                bounds=self.prob_bounds,
             ),
             "P(L)": dict(
                 shape=(latent_dim,),
-                bounds=(0, 1),
+                bounds=self.prob_bounds,
             ),
         }
 
@@ -169,15 +171,15 @@ class Superluminal(ClassicalProbabilityCausalModel):
         self.terms = {
             "P(X=0|STL)": dict(
                 shape=(n_settings, n_settings, latent_dim),
-                bounds=(0, 1),
+                bounds=self.prob_bounds,
             ),
             "P(Y=0|TL)": dict(
                 shape=(n_settings, latent_dim),
-                bounds=(0, 1),
+                bounds=self.prob_bounds,
             ),
             "P(L)": dict(
                 shape=(latent_dim,),
-                bounds=(0, 1),
+                bounds=self.prob_bounds,
             ),
         }
 
@@ -222,6 +224,8 @@ if __name__ == "__main__":
     m = 40
     p = 0.0
     latent_dim = 100
+    n_steps = 1000
+    lr = 0.005
 
     data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{run}.npy"))
     if use_device:
@@ -231,33 +235,47 @@ if __name__ == "__main__":
 
     for Model in [
         ClassicalCommonCause,
-        Superdeterminism,
-        Superluminal,
+        # Superdeterminism,
+        # Superluminal,
     ]:
         model = Model(n_settings=m, latent_dim=latent_dim)
 
-        if use_device:
-            model = model.to(device)
+        # for _ in range(3):
+        pred = model.forward()
 
-        optimizer = torch.optim.Adagrad(model.parameters(), lr=0.5)
+        fig, axs = plt.subplots(nrows=1, ncols=2)
+        k = 5
+        axs[0].imshow(to_numpy(data[:, :, :k, :k]).reshape([4, k**2]))
+        axs[1].imshow(to_numpy(pred[:, :, :k, :k]).reshape([4, k**2]))
 
-        t0 = time.time()
-        losses = fit(model, data, optimizer, n_steps=400)
+        plt.show()
 
-        training_curves[model.__class__.__name__] = losses
+        # if use_device:
+        #     model = model.to(device)
+        #
+        # optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+        # loss = torch.nn.MSELoss()
+        # # loss = torch.nn.KLDivLoss()
+        #
+        # t0 = time.time()
+        # losses = fit(model, data, optimizer, loss, n_steps=n_steps)
+        # pred = model.forward()
+        #
+        # training_curves[model.__class__.__name__] = losses
+        #
+        # print(
+        #     f"\n{model.__class__.__name__} | "
+        #     f"\n\tTotal time: {time.time() - t0}| "
+        #     f"\n\tTotal parameters: {sum(p.numel() for p in model.parameters())}"
+        #     f"\n\tFinal loss: {losses[-1]}"
+        # )
+        #
+        # torch.cuda.empty_cache()
 
-        print(
-            f"\n{model.__class__.__name__} | "
-            f"\n\tTotal time: {time.time() - t0}| "
-            f"\n\tTotal parameters: {sum(p.numel() for p in model.parameters())}"
-            f"\n\tFinal loss: {losses[-1]}"
-        )
-
-        torch.cuda.empty_cache()
-
-    fig, ax = plt.subplots(1, 1)
-    for label, losses in training_curves.items():
-        ax.plot(np.arange(len(losses)), np.log(losses), label=f"{label}")
-
-    ax.legend()
-    plt.show()
+    #%%
+    # fig, ax = plt.subplots(1, 1)
+    # for label, losses in training_curves.items():
+    #     ax.plot(np.arange(len(losses)), np.log(losses), label=f"{label}")
+    #
+    # ax.legend()
+    # plt.show()

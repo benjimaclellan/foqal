@@ -11,10 +11,8 @@ import random
 
 def current_time():
     """
-
-    Returns
-    -------
-    Current date and time in a consistent format, used for monitoring long-running measurements
+    Common format for current date & time
+    :return: date and time as formatted string
     """
     return datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
 
@@ -23,18 +21,10 @@ class IO:
     """
     The IO class encapsulates all saving/loading features of data, figures, etc.
     This provides consistent filetypes, naming conventions, etc.
-
-    Typical usage:
-        io = IO(path=r"\path\to\data")
-        io.load_txt(filename="filename.txt")
-
-    or
-        io = IO.create_new_save_folder(folder="subfolder", include_date=True, include_uuid=True)
-        io.save_df(df, filename="dataframe.txt")
     """
 
-    # default save path always points to qoqi/data no matter where this repository is located
-    default_path = pathlib.Path(__file__).parent.parent.parent.joinpath("data")
+    # default save path always points to ../data no matter where this repository is located
+    default_path = pathlib.Path(__file__).parent.parent.joinpath("data")
 
     def __init__(self, path=None, verbose=True):
         self.verbose = verbose
@@ -50,15 +40,22 @@ class IO:
 
     @classmethod
     def directory(
-        cls, path=None, folder="", include_date=False, include_uuid=False, verbose=True
+        cls,
+        path=None,
+        folder="",
+        include_date=False,
+        include_time=False,
+        include_id=False,
+        verbose=True,
     ):
         """
 
-        :param path: The parent folder. Should be a string of pathlib.Path object.
+        :param path: The parent folder.
         :param folder: The main, descriptive folder name.
-        :param include_date: boolean. Add the date to the front of the path.
-        :param include_uuid: boolean. Add a random string of characters to the end of the path.
-        :param verbose: boolean. If True, will print out the path of each saved/loaded file.
+        :param include_date: If True, add the date to the front of the path. Otherwise, do not add the date
+        :param include_time: If True, add the time to the front of the path. Otherwise, do not add the time
+        :param include_id: If True, add a random string of characters to the end of the path. Otherwise, do not
+        :param verbose: If True, will print out the path of each saved/loaded file.
         :return: A new IO class instance
         """
         if path is None:
@@ -68,22 +65,28 @@ class IO:
             path = pathlib.Path(path)
 
         date = datetime.date.today().isoformat()
+        time = datetime.datetime.now().strftime("%H-%M-%S")
         if not folder:  # if empty string
             warnings.warn(
                 "No folder entered. Saving to a folder with a unique identifier"
             )
-            include_data, include_uuid, verbose = True, True, True
+            include_data, include_id, verbose = True, True, True
 
+        # build the full folder name with date, time, and uuid, if selected
+        _str = ""
         if include_date:
-            folder = date + " " + folder
-        if include_uuid:
-            folder = (
-                folder
-                + " - "
-                + "".join(random.choice(string.hexdigits) for _ in range(4))
+            _str = _str + date
+        if include_time:
+            _str = _str + "_" + time
+
+        _str = _str + "_" + folder
+
+        if include_id:
+            _str = (
+                _str + "_" + "".join(random.choice(string.hexdigits) for _ in range(4))
             )
 
-        path = path.joinpath(folder)
+        path = path.joinpath(_str)
         return cls(path=path, verbose=verbose)
 
     def save_json(self, variable, filename):
