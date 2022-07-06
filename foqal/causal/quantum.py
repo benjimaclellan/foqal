@@ -13,10 +13,6 @@ class QuantumCommonCause(ModelBase):
     """
     The quantum common cause model is a parametrically radical, but structurally conservative model.
 
-    .math
-    {
-    text-align:center;
-    }
     :math:`P_{XY|ST} = \\text{Tr} \\left[ (E_{X|S} \\otimes E_{Y|T}) \\ \\rho_{AB}  \\right]`
 
     """

@@ -1,20 +1,26 @@
 Causal Models
 ==============================
 
+Daley, P. J., Resch, K. J. & Spekkens, R. W.
+Experimentally adjudicating between different causal accounts of Bell-inequality violations via statistical model selection.
+Physical Review A vol. 105 (2022).
 
-Classical, Common Cause
+Parametrically conservative, structurally conservative
 ------------------------------
 
 .. autoclass:: foqal.causal.classical.ClassicalCommonCause
     :members:
 
-.. autoclass:: foqal.causal.classical.Superdetermism
+Parametrically conservative, structurally radical
+------------------------------
+
+.. autoclass:: foqal.causal.classical.Superdeterminism
     :members:
 
 .. autoclass:: foqal.causal.classical.Superluminal
     :members:
 
-Quantum, Common Cause
+Parametrically radical, structurally conservative
 ------------------------------
 
 .. autoclass:: foqal.causal.quantum.QuantumCommonCause

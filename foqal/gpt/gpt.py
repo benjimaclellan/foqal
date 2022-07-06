@@ -14,7 +14,7 @@ class GeneralizedProbabilityTheory(ModelBase):
     A generalized probabilistic theory (GPT) is a general framework to describe the operational features of
     arbitrary physical theories.
 
-    The model implemented here is based off of the approach in,
+    :math:`\\mathcal{D} = \\mathbf{S} \\times \\mathbf{E}`
 
     """
 

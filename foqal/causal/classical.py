@@ -25,21 +25,22 @@ class ClassicalProbabilityCausalModel(ModelBase):
 
 class ClassicalCommonCause(ClassicalProbabilityCausalModel):
     """
-    A local hidden-variable model.
+    This model is both parameterically and structurally conservative,
+    and can be defined as a classical local, hidden-variable model.
 
-    This model is both parameterically and structurally conservative.
-
-    The joint probability of measurement outcomes X and Y is given by,
+    The joint probability of binary measurement outcomes X and Y for settings S and T is,
     :math:`P_{XY|ST} = \\sum_{\\lambda \in \\Lambda} P_{X|S\\lambda} P_{Y|T\\lambda} P_{\\lambda}`
 
-    See Daley et al. for more details:
-    https://journals.aps.org/pra/abstract/10.1103/PhysRevA.105.042220
-
-    Has a total of
-    :math:`|\\Lambda | m^2`
+    Number of parameters:
+    :math:`|\\Lambda | (2m + 1)`
     """
 
     def __init__(self, n_settings: int, latent_dim: int, **kwargs):
+        """
+        :param n_settings: number of measurement settings
+        :param latent_dim: cardinality of the latent variable
+        :param kwargs:
+        """
         super().__init__(n_settings, latent_dim, **kwargs)
 
         self.terms = {
@@ -83,6 +84,16 @@ class ClassicalCommonCause(ClassicalProbabilityCausalModel):
 
 
 class Superdeterminism(ClassicalProbabilityCausalModel):
+    """
+    This model is parameterically conservative and structurally radical.
+
+    The joint probability of binary measurement outcomes X and Y for settings S and T is,
+    :math:`P_{XY|ST} = \\sum_{\\lambda \\in \\Lambda} P_{X|S\\lambda} P_{Y|T\\lambda} P_{S | \\lambda} P_{\\lambda} \\left( \\sum_{\\lambda \\in \\Lambda} P_{S|\\lambda'} P_{\\lambda} \\right)^{-1}`
+
+    Number of parameters:
+    :math:`|\\Lambda | (3m + 1)`
+    """
+
     def __init__(self, n_settings: int, latent_dim: int, **kwargs):
         super().__init__(n_settings, latent_dim, **kwargs)
 
@@ -142,6 +153,16 @@ class Superdeterminism(ClassicalProbabilityCausalModel):
 
 
 class Superluminal(ClassicalProbabilityCausalModel):
+    """
+    This model is parameterically conservative and structurally radical.
+
+    The joint probability of binary measurement outcomes X and Y for settings S and T is,
+    :math:`P_{XY|ST} = \\sum_{\\lambda \in \\Lambda} P_{X|S\\lambda} P_{Y|ST\\lambda} P_{S | \\lambda} P_{\\lambda}`
+
+    Number of parameters:
+    :math:`|\\Lambda | (m^2 + m + 1)`
+    """
+
     def __init__(self, n_settings: int, latent_dim: int, **kwargs):
         super().__init__(n_settings, latent_dim, **kwargs)
 
@@ -198,7 +219,7 @@ if __name__ == "__main__":
     )
 
     run = 0
-    m = 100
+    m = 40
     p = 0.0
     latent_dim = 100
 
