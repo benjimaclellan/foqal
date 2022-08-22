@@ -72,14 +72,15 @@ class IO:
             )
             include_data, include_id, verbose = True, True, True
 
-        # build the full folder name with date, time, and uuid, if selected
+        # build the full folder name with date, time, and id, if selected
         _str = ""
-        if include_date:
-            _str = _str + date
-        if include_time:
-            _str = _str + "_" + time
 
-        _str = _str + "_" + folder
+        if include_date and not include_time:
+            _str = _str + date + "_"
+        elif include_date and include_time:
+            _str = _str + date + time + "_"
+
+        _str = _str + folder
 
         if include_id:
             _str = (

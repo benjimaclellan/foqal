@@ -5,21 +5,18 @@ import pandas as pd
 import torch
 from torch.functional import F
 
-from foqal.io import IO
+from foqal.utils.io import IO
 from foqal.causal.classical import ClassicalCommonCause, Superdeterminism, Superluminal
 from foqal.causal.quantum import QuantumCommonCause
 from foqal.fit import fit
 
 
 if __name__ == "__main__":
-    use_device = True
     print(f"CUDA is available: {torch.cuda.is_available()}")
-    print(f"Number of devices: {torch.cuda.device_count()}")
-    print(f"Current device: {torch.cuda.get_device_name(0)}")
-    device = torch.cuda.current_device()
+    device = "cpu"
 
     io = IO.directory(
-        folder="entangled-state-data", include_date=False, include_uuid=False, verbose=False,
+        folder="entangled-state-data", include_date=False, include_id=False, verbose=True,
     )
 
     # ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
@@ -38,11 +35,8 @@ if __name__ == "__main__":
         (m, p) = q[i]
         pbar.set_description(f"m={m} | p={p}")
 
-        train_data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{0}.npy"))
-        test_data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{1}.npy"))
-        if use_device:
-            train_data = train_data.to(device)
-            test_data = test_data.to(device)
+        train_data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{0}.npy")).to(device)
+        test_data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{1}.npy")).to(device)
 
         for Model in [
             ClassicalCommonCause,
@@ -56,9 +50,7 @@ if __name__ == "__main__":
                 _latent_dim = latent_dim
 
             model = Model(n_settings=m, latent_dim=_latent_dim)
-
-            if use_device:
-                model = model.to(device)
+            model = model.to(device)
 
             optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
 
@@ -99,6 +91,6 @@ if __name__ == "__main__":
     df = pd.DataFrame(df)
 
     io = IO.directory(
-        folder=f"entangled-state-data-{m}", include_date=False, include_uuid=False, verbose=True,
+        folder=f"entangled-state-data-{m}", include_date=False, include_id=False, verbose=True,
     )
     io.save_dataframe(df, filename="summary_of_fitting.txt")
