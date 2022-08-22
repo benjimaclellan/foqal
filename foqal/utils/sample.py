@@ -8,7 +8,6 @@ def bloch_vector_to_ket(vector):
     phi = np.arctan2(y, x)
     ket = qt.Qobj(
         np.array([[np.cos(theta)], [np.exp(1j * phi) * np.sin(theta)]]),
-        # dims=((2,), (1,),)
     )
     return ket
 
@@ -18,7 +17,7 @@ def bloch_vectors_to_kets(vectors):
     return kets
 
 
-def distribute_points_on_sphere(num_samples: int = 1000, method: str = "spiral"):
+def sample_bloch_vectors(num_samples: int = 1000, method: str = "spiral"):
     """
 
     Acknowledgements to https://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere

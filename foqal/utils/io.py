@@ -24,7 +24,7 @@ class IO:
     """
 
     # default save path always points to ../data no matter where this repository is located
-    default_path = pathlib.Path(__file__).parent.parent.joinpath("data")
+    default_path = pathlib.Path(__file__).parent.parent.parent.joinpath("data")
 
     def __init__(self, path=None, verbose=True):
         self.verbose = verbose
@@ -73,21 +73,26 @@ class IO:
             include_data, include_id, verbose = True, True, True
 
         # build the full folder name with date, time, and id, if selected
-        _str = ""
+        # folder.replace(r"\", r"/")
+        parts = folder.split("/")
 
+        _str = ""
         if include_date and not include_time:
             _str = _str + date + "_"
         elif include_date and include_time:
             _str = _str + date + time + "_"
 
-        _str = _str + folder
+        # _str = _str + folder
+        _str = _str + parts[-1]
 
         if include_id:
             _str = (
                 _str + "_" + "".join(random.choice(string.hexdigits) for _ in range(4))
             )
 
-        path = path.joinpath(_str)
+        parts[-1] = _str
+        # path = path.joinpath(_str)
+        path = path.joinpath("/".join(parts))
         return cls(path=path, verbose=verbose)
 
     def save_json(self, variable, filename):

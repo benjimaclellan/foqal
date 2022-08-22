@@ -6,13 +6,13 @@ Experimentally adjudicating between different causal accounts of Bell-inequality
 Physical Review A vol. 105 (2022).
 
 Parametrically conservative, structurally conservative
-------------------------------
+--------------------------------------------------------
 
 .. autoclass:: foqal.causal.classical.ClassicalCommonCause
     :members:
 
 Parametrically conservative, structurally radical
-------------------------------
+---------------------------------------------------
 
 .. autoclass:: foqal.causal.classical.Superdeterminism
     :members:
@@ -21,7 +21,7 @@ Parametrically conservative, structurally radical
     :members:
 
 Parametrically radical, structurally conservative
-------------------------------
+---------------------------------------------------
 
 .. autoclass:: foqal.causal.quantum.QuantumCommonCause
     :members:

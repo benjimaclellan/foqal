@@ -75,22 +75,44 @@ def cross_validation(
     """
     d = []
     for i, data in enumerate(datasets):
-        fit(model, data=data, optimizer=optimizer, loss=loss, n_steps=n_steps)
+        losses = fit(model, data=data, optimizer=optimizer, loss=loss, n_steps=n_steps)
         pred = model.forward()
 
-        _train = to_numpy(loss(pred, data))
-        _tests = []
+        _train_loss = to_numpy(loss(pred, data))
+        _test_losses = []
         for k, data_k in enumerate(datasets):
             if i == k:
                 continue
-            _tests.append(to_numpy(loss(pred, data_k)))
+            _test_losses.append(to_numpy(loss(pred, data_k)))
 
         d.append(
             dict(
-                train=_train,
-                test_mean=np.mean(_tests),
-                test_std=np.std(_tests),
+                train=_train_loss,
+                test_mean=np.mean(_test_losses),
+                test_std=np.std(_test_losses),
+                training_curve=losses,
             )
         )
 
-    return pd.DataFrame(d)
+    return d
+
+
+def convert_array_to_mat(ar: np.ndarray, num_settings: int):
+    """
+    Converts from the nd-array data format to the matrix format
+    Parameters
+    ----------
+    ar: 4-dimensional array representing the data frequency outcomes
+    num_settings: number of settings for the data (required for proper indexing)
+
+    Returns
+    -------
+    d: a 2-d numpy array in the 4 x m^2 matrix form (more human-readable)
+    """
+    d = np.zeros([num_settings * num_settings, 4])
+    for x in (0, 1):
+        for y in (0, 1):
+            for s in range(num_settings):
+                for t in range(num_settings):
+                    d[s * num_settings + t, 2 * x + y] = ar[x, y, s, t]
+    return d.T

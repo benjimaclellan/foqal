@@ -130,7 +130,7 @@ dmypy.json
 
 jobs/
 data/
-scratch/
+.scratch/
 
 .idea/
 

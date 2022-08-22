@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from foqal.model import ModelBase
-from foqal.io import IO
+from foqal.utils.io import IO
 from foqal.fit import fit, to_numpy
 
 
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     device = torch.cuda.current_device()
 
     io = IO.directory(
-        folder="entangled-state-data", include_date=False, include_uuid=False
+        folder="entangled-state-data", include_date=False, include_id=False
     )
 
     run = 0
@@ -250,32 +250,32 @@ if __name__ == "__main__":
 
         plt.show()
 
-        # if use_device:
-        #     model = model.to(device)
-        #
-        # optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-        # loss = torch.nn.MSELoss()
-        # # loss = torch.nn.KLDivLoss()
-        #
-        # t0 = time.time()
-        # losses = fit(model, data, optimizer, loss, n_steps=n_steps)
-        # pred = model.forward()
-        #
-        # training_curves[model.__class__.__name__] = losses
-        #
-        # print(
-        #     f"\n{model.__class__.__name__} | "
-        #     f"\n\tTotal time: {time.time() - t0}| "
-        #     f"\n\tTotal parameters: {sum(p.numel() for p in model.parameters())}"
-        #     f"\n\tFinal loss: {losses[-1]}"
-        # )
-        #
-        # torch.cuda.empty_cache()
+        if use_device:
+            model = model.to(device)
+
+        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+        loss = torch.nn.MSELoss()
+        # loss = torch.nn.KLDivLoss()
+
+        t0 = time.time()
+        losses = fit(model, data, optimizer, loss, n_steps=n_steps)
+        pred = model.forward()
+
+        training_curves[model.__class__.__name__] = losses
+
+        print(
+            f"\n{model.__class__.__name__} | "
+            f"\n\tTotal time: {time.time() - t0}| "
+            f"\n\tTotal parameters: {sum(p.numel() for p in model.parameters())}"
+            f"\n\tFinal loss: {losses[-1]}"
+        )
+
+        torch.cuda.empty_cache()
 
     #%%
-    # fig, ax = plt.subplots(1, 1)
-    # for label, losses in training_curves.items():
-    #     ax.plot(np.arange(len(losses)), np.log(losses), label=f"{label}")
-    #
-    # ax.legend()
-    # plt.show()
+    fig, ax = plt.subplots(1, 1)
+    for label, losses in training_curves.items():
+        ax.plot(np.arange(len(losses)), np.log(losses), label=f"{label}")
+
+    ax.legend()
+    plt.show()

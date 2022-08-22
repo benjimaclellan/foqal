@@ -3,8 +3,8 @@ import numpy as np
 import itertools
 import warnings
 
-from foqal.io import IO
-from foqal.utils.sample import distribute_points_on_sphere, bloch_vectors_to_kets
+from foqal.utils.io import IO
+from foqal.utils.sample import sample_bloch_vectors, bloch_vectors_to_kets
 
 
 def simulate_quantum_states_effects(
@@ -22,10 +22,10 @@ def simulate_quantum_states_effects(
 
     if method in ("fibonnaci", "spiral"):
         _states = bloch_vectors_to_kets(
-            distribute_points_on_sphere(num_samples=n_states, method=method)
+            sample_bloch_vectors(num_samples=n_states, method=method)
         )
         _effects = bloch_vectors_to_kets(
-            distribute_points_on_sphere(num_samples=n_effects, method=method)
+            sample_bloch_vectors(num_samples=n_effects, method=method)
         )
 
         states = [qt.tensor(*s) for s in itertools.product(_states, repeat=n_parties)]
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         folder="gpt-generated-data",
         verbose=False,
         include_date=False,
-        include_uuid=False,
+        include_id=False,
     )
 
     n_parties = 1

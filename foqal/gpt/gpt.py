@@ -6,7 +6,7 @@ import time
 from foqal.fit import fit, loss_function
 
 from foqal.model import ModelBase
-from foqal.io import IO
+from foqal.utils.io import IO
 
 
 class GeneralizedProbabilityTheory(ModelBase):
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     device = torch.cuda.current_device()
 
     io = IO.directory(
-        folder="gpt-generated-data", include_date=False, include_uuid=False
+        folder="gpt-generated-data", include_date=False, include_id=False
     )
     n_states, n_effects = 100, 100
     n_parties = 1

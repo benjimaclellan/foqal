@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from foqal.model import ModelBase
-from foqal.io import IO
+from foqal.utils.io import IO
 from foqal.fit import fit
 
 
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     device = torch.cuda.current_device()
 
     io = IO.directory(
-        folder="entangled-state-data", include_date=False, include_uuid=False
+        folder="entangled-state-data", include_date=False, include_id=False
     )
 
     run = 0

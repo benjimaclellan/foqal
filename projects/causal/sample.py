@@ -6,7 +6,7 @@ from foqal.utils.sample import sample_bloch_vectors, bloch_vectors_to_kets
 from foqal.utils.constants import channels
 
 
-def simulate_joint_measurements(
+def simulate_local_projective_measurements(
     state: qt.Qobj,
     n_datasets: int = 2,
     m: int = 10,
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     for m in ms:
         for p in ps:
             state = channels["depolarized"](p=p)
-            datasets = simulate_joint_measurements(
+            datasets = simulate_local_projective_measurements(
                 state=state,
                 n_datasets=n_datatsets,
                 m=m,
@@ -78,5 +78,5 @@ if __name__ == "__main__":
 
                 io.save_np_array(
                     data.astype("float"),
-                    filename=f"num_states={n_settings}_p={int(100 * p)}_{k}",
+                    filename=f"num_states={m}_p={int(100 * p)}_{k}",
                 )
