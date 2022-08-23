@@ -28,8 +28,8 @@ if __name__ == "__main__":
     ms = (5, 10, 15, 20, 25, 30, 40, 50, 60)
 
     latent_dim = 100
-    lr = 0.25
-    n_steps = 500
+    lr = 0.15
+    n_steps = 1000
     n_datasets = 5
 
     verbose, show = False, False
@@ -60,7 +60,6 @@ if __name__ == "__main__":
                 optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
                 loss = torch.nn.MSELoss()
 
-                uid = uuid.uuid4().hex
                 results = cross_validation(
                     model,
                     datasets=datasets,
@@ -70,6 +69,7 @@ if __name__ == "__main__":
                 )
 
                 for r in results:
+                    uid = uuid.uuid4().hex
                     output.save_np_array(
                         r["training_curve"], filename=f"training_curves/{uid}.npy"
                     )
