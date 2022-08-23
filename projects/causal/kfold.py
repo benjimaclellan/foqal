@@ -13,34 +13,30 @@ if __name__ == "__main__":
     device = "cuda"
 
     input = IO.directory(
-        folder="entangled-state-data",
+        folder="ibmq-simulator_bell-state_local-projections_depolarized-channel",
         include_date=False,
         include_id=False,
         verbose=False,
     )
     output = IO.directory(
-        folder="entangled-state-data/cross_val",
+        folder="ibmq-simulator_bell-state_local-projections_depolarized-channel/cross_val",
         include_date=True,
         include_id=True,
         verbose=False,
     )
-    # ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,)
-    ps = (
-        0.0,
-        1.0,
-    )
+    ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,)
     ms = (5, 10)
-    print(output.path)
+
     latent_dim = 10
     lr = 0.25
-    n_steps = 300
-    n_datasets = 3
+    n_steps = 500
+    n_datasets = 5
 
     verbose, show = False, False
     df = []
     for j, m in enumerate(ms):
         for i, p in enumerate(ps):
-            filename = lambda k: f"m={m}_p={p}_run{k}.npy"
+            filename = lambda k: f"m={m}_p={p}_{k}.npy"
             datasets = [
                 torch.Tensor(input.load_np_array(filename=filename(k))).to(device)
                 for k in range(n_datasets)

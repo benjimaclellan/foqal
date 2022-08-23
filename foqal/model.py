@@ -18,7 +18,6 @@ class ModelBase(nn.Module):
 
         self.terms = {}
         self.params = None
-
         return
 
     def forward(self):

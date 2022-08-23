@@ -118,4 +118,4 @@ for m in ms:
 
             data = data / np.sum(data, axis=(0, 1))
 
-            io.save_np_array(data, filename=f"num_states={m}_p={int(100 * p)}_{k}")
+            io.save_np_array(data, filename=f"m={m}_p={p}_{k}")

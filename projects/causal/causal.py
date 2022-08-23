@@ -37,11 +37,12 @@ if __name__ == "__main__":
         0.9,
         1.0,
     )
-    ms = (5, 10, 15, 20, 30)
+    ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80)
+    ks = 5
 
     latent_dim = 50
     lr = 0.25
-    n_steps = 300
+    n_steps = 500
 
     q = list(itertools.product(ms, ps))
 
@@ -73,19 +74,11 @@ if __name__ == "__main__":
             model = model.to(device)
 
             optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
-            loss = torch.nn.MSELoss()
+            loss = torch.nn.KLDivLoss()
 
             t0 = time.time()
             losses = fit(model, train_data, optimizer, loss, n_steps=n_steps, progress=False)
             t1 = time.time()
-
-            # if verbose:
-            #     print(
-            #         f"\n{model.__class__.__name__} | "
-            #         f"\n\tTotal time: {t1 - t0}| "
-            #         f"\n\tTotal parameters: {sum(p.numel() for p in model.parameters())}"
-            #         f"\n\tFinal loss: {losses[-1]}"
-            #     )
 
             torch.cuda.empty_cache()
 
@@ -103,7 +96,6 @@ if __name__ == "__main__":
                     latent_dim=_latent_dim,
                     train_loss=losses[-1].item(),
                     test_loss=loss_test,
-                    # train_curve=losses,
                     t=(t1 - t0),
                     lr=lr,
                     n_steps=n_steps,
