@@ -104,4 +104,4 @@ if __name__ == "__main__":
 
     df = pd.DataFrame(df)
     io.verbose = True
-    io.save_dataframe(df, filename="summary_of_fitting.txt")
+    io.save_dataframe(df, filename="model_summary.txt")

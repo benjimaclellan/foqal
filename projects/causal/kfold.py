@@ -69,25 +69,25 @@ if __name__ == "__main__":
                     n_steps=n_steps,
                 )
 
-                output.save_np_array(
-                    results[0]["training_curve"], filename=f"training_curves/{uid}.npy"
-                )
-
-                results = pd.DataFrame(results)
-                df.append(
-                    dict(
-                        model=model.__class__.__name__,
-                        m=m,
-                        p=p,
-                        latent_dim=_latent_dim,
-                        train_loss=results["train"].mean(),
-                        test_loss=results["test_mean"].mean(),
-                        test_std=results["test_std"].mean(),
-                        lr=lr,
-                        n_steps=n_steps,
-                        uid=uid,
+                for r in results:
+                    output.save_np_array(
+                        r["training_curve"], filename=f"training_curves/{uid}.npy"
                     )
-                )
+
+                    df.append(
+                        dict(
+                            model=model.__class__.__name__,
+                            m=m,
+                            p=p,
+                            latent_dim=_latent_dim,
+                            train_loss=r["train"],
+                            test_loss=r["test_mean"],
+                            test_std=r["test_std"],
+                            lr=lr,
+                            n_steps=n_steps,
+                            uid=uid,
+                        )
+                    )
 
     df = pd.DataFrame(df)
     output.save_dataframe(df, filename="model_summary.txt")
