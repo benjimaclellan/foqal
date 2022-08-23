@@ -25,9 +25,9 @@ if __name__ == "__main__":
         verbose=False,
     )
     ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,)
-    ms = (5, 10)
+    ms = (5, 10, 15, 20, 25, 30, 40, 50, 60)
 
-    latent_dim = 10
+    latent_dim = 100
     lr = 0.25
     n_steps = 500
     n_datasets = 5
