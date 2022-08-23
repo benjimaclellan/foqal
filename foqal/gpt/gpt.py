@@ -56,9 +56,7 @@ if __name__ == "__main__":
     print(f"Current device: {torch.cuda.get_device_name(0)}")
     device = torch.cuda.current_device()
 
-    io = IO.directory(
-        folder="gpt-generated-data", include_date=False, include_id=False
-    )
+    io = IO.directory(folder="gpt-generated-data", include_date=False, include_id=False)
     n_states, n_effects = 100, 100
     n_parties = 1
     dim = 5

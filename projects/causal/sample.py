@@ -11,7 +11,7 @@ def simulate_local_projective_measurements(
     n_datasets: int = 2,
     m: int = 10,
     method: str = "fibonnaci",
-    total_counts=2000
+    total_counts=2000,
 ):
     """
     Simulates two-qubit measurement outcome probabilities for pairs of local, sampled projective measurements.
@@ -27,9 +27,7 @@ def simulate_local_projective_measurements(
     """
     assert method in ("fibonnaci", "haar")
 
-    settings = bloch_vectors_to_kets(
-        sample_bloch_vectors(num_samples=m, method=method)
-    )
+    settings = bloch_vectors_to_kets(sample_bloch_vectors(num_samples=m, method=method))
     settings = [qt.ket2dm(setting) for setting in settings]
 
     data = np.zeros([2, 2, m, m])
@@ -59,8 +57,8 @@ if __name__ == "__main__":
         include_date=False,
         include_id=False,
     )
-    n_datatsets = 5
-    ms = (30,)
+    n_datasets = 5
+    ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
     ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 
     for m in ms:
@@ -68,7 +66,7 @@ if __name__ == "__main__":
             state = channels["depolarized"](p=p)
             datasets = simulate_local_projective_measurements(
                 state=state,
-                n_datasets=n_datatsets,
+                n_datasets=n_datasets,
                 m=m,
                 method="fibonnaci",
             )

@@ -13,17 +13,33 @@ from foqal.fit import fit
 
 if __name__ == "__main__":
     print(f"CUDA is available: {torch.cuda.is_available()}")
-    device = "cpu"
+    device = "cuda"
 
     io = IO.directory(
-        folder="entangled-state-data", include_date=False, include_id=False, verbose=True,
+        # folder="entangled-state-data",
+        folder="ibmq-simulator_bell-state_local-projections_depolarized-channel",
+        include_date=False,
+        include_id=False,
+        verbose=False,
     )
 
     # ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
-    ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,)
-    ms = (10,)
+    ps = (
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1.0,
+    )
+    ms = (5, 10, 15, 20, 30)
 
-    latent_dim = 100
+    latent_dim = 50
     lr = 0.25
     n_steps = 300
 
@@ -35,8 +51,12 @@ if __name__ == "__main__":
         (m, p) = q[i]
         pbar.set_description(f"m={m} | p={p}")
 
-        train_data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{0}.npy")).to(device)
-        test_data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{1}.npy")).to(device)
+        train_data = torch.Tensor(
+            io.load_np_array(filename=f"num_states={m}_p={int(100 * p)}_{0}.npy")
+        ).to(device)
+        test_data = torch.Tensor(
+            io.load_np_array(filename=f"num_states={m}_p={int(100 * p)}_{1}.npy")
+        ).to(device)
 
         for Model in [
             ClassicalCommonCause,
@@ -53,44 +73,43 @@ if __name__ == "__main__":
             model = model.to(device)
 
             optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
+            loss = torch.nn.MSELoss()
 
             t0 = time.time()
-            losses = fit(model, train_data, optimizer, n_steps=n_steps, progress=True)
+            losses = fit(model, train_data, optimizer, loss, n_steps=n_steps, progress=False)
             t1 = time.time()
 
-            if verbose:
-                print(
-                    f"\n{model.__class__.__name__} | "
-                    f"\n\tTotal time: {t1 - t0}| "
-                    f"\n\tTotal parameters: {sum(p.numel() for p in model.parameters())}"
-                    f"\n\tFinal loss: {losses[-1]}"
-                )
+            # if verbose:
+            #     print(
+            #         f"\n{model.__class__.__name__} | "
+            #         f"\n\tTotal time: {t1 - t0}| "
+            #         f"\n\tTotal parameters: {sum(p.numel() for p in model.parameters())}"
+            #         f"\n\tFinal loss: {losses[-1]}"
+            #     )
 
             torch.cuda.empty_cache()
 
-            loss_test = F.mse_loss(model.forward(), test_data)
+            loss_test = loss(model.forward(), test_data)
             if loss_test.is_cuda:
                 loss_test = loss_test.cpu().detach().numpy().item()
             else:
                 loss_test = loss_test.detach().numpy().item()
 
-            df.append(dict(
-                model=model.__class__.__name__,
-                m=m,
-                p=p,
-                latent_dim=_latent_dim,
-                train_loss=losses[-1].item(),
-                test_loss=loss_test,
-                # train_curve=losses,
-                t=(t1 - t0),
-                lr=lr,
-                n_steps=n_steps,
-            ))
+            df.append(
+                dict(
+                    model=model.__class__.__name__,
+                    m=m,
+                    p=p,
+                    latent_dim=_latent_dim,
+                    train_loss=losses[-1].item(),
+                    test_loss=loss_test,
+                    # train_curve=losses,
+                    t=(t1 - t0),
+                    lr=lr,
+                    n_steps=n_steps,
+                )
+            )
 
-    io.verbose = True
     df = pd.DataFrame(df)
-
-    io = IO.directory(
-        folder=f"entangled-state-data-{m}", include_date=False, include_id=False, verbose=True,
-    )
+    io.verbose = True
     io.save_dataframe(df, filename="summary_of_fitting.txt")

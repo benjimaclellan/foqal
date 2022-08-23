@@ -2,9 +2,12 @@
 Implementation of depolarizing channel on ibmQ
 https://matteoacrossi.github.io/oqs-jupyterbook/project_1-solution.html
 """
+import itertools
 import numpy as np
 from qiskit import QuantumRegister, QuantumCircuit, Aer, execute, ClassicalRegister
 import matplotlib.pyplot as plt
+
+from foqal.utils.io import IO
 
 
 def depolarizing_channel(q, c, p, system=1, ancillae=(2, 3, 4)):
@@ -42,14 +45,18 @@ def bell_state(q, c):
     return bs
 
 
-def rotate_measurement_basis(q, c):
+def rotate_measurement_basis(q, c, basis0, basis1):
     rm = QuantumCircuit(q, c)
 
-    for i in (0, 1):
-        rm.rx(np.random.uniform(0, 2*np.pi), q[i])
-        rm.ry(np.random.uniform(0, 2*np.pi), q[i])
-        rm.rz(np.random.uniform(0, 2*np.pi), q[i])
+    for i, rots in {0: basis0, 1: basis1}.items():
+        rm.rx(rots[0], q[i])
+        rm.ry(rots[1], q[i])
+        rm.rz(rots[2], q[i])
     return rm
+
+
+def sample_rotations():
+    return np.random.uniform(0, 2 * np.pi, 3)
 
 
 def trace_out_ancillae(counts: dict):
@@ -60,23 +67,55 @@ def trace_out_ancillae(counts: dict):
 
 
 # Prepare the qubit in a state that has coherence and different populations
-q = QuantumRegister(5, 'q')
-c = ClassicalRegister(5, 'c')
+q = QuantumRegister(5, "q")
+c = ClassicalRegister(5, "c")
 
 # p_values = np.linspace(0, 1, 10)
-ps = (1.0, )
+# ms = (5,)
+# ps = (0.0,)
+# n_datasets = 1
+
+n_datasets = 5
+ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
+ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
+
+io = IO.directory(
+        folder="ibmq-simulator_bell-state_local-projections_depolarized-channel",
+        verbose=True,
+        include_date=False,
+        include_id=False,
+    )
 
 # Here we will create a list of results for each different value of p
 circuits = []
 
-for p in ps:
-    circ = bell_state(q, c) + depolarizing_channel(q, c, p) + rotate_measurement_basis(q, c)
-    circ.measure_all(add_bits=False)
-    circuits.append(circ)
+for m in ms:
+    rotations = []
+    for i in range(m):
+        rotations.append(sample_rotations())
 
-results = []
-for circ in circuits:
-    job = execute(circ, Aer.get_backend('qasm_simulator'), shots=10000)
-    results.append(job.result())
-    print(job.result().get_counts())
-    print(trace_out_ancillae(job.result().get_counts()))
+    for p in ps:
+        for k in range(n_datasets):
+            data = np.zeros([2, 2, m, m])
+            for i, j in itertools.product(range(m), range(m)):
+                circ = (
+                    bell_state(q, c)
+                    + depolarizing_channel(q, c, p)
+                    + rotate_measurement_basis(q, c, rotations[i], rotations[j])
+                )
+                circ.measure_all(add_bits=False)
+
+                job = execute(circ, Aer.get_backend("qasm_simulator"), shots=10000)
+                counts = trace_out_ancillae(job.result().get_counts())
+                print(
+                    f"m={m}, p={p}, k={k}| i={i}, j={j} | {counts}"
+                )
+
+                data[0, 0, i, j] = counts["00"]
+                data[0, 1, i, j] = counts["10"]
+                data[1, 0, i, j] = counts["01"]
+                data[1, 1, i, j] = counts["11"]
+
+            data = data / np.sum(data, axis=(0, 1))
+
+            io.save_np_array(data, filename=f"num_states={m}_p={int(100 * p)}_{k}")
