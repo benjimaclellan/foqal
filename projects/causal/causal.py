@@ -53,10 +53,10 @@ if __name__ == "__main__":
         pbar.set_description(f"m={m} | p={p}")
 
         train_data = torch.Tensor(
-            io.load_np_array(filename=f"num_states={m}_p={int(100 * p)}_{0}.npy")
+            io.load_np_array(filename=f"num_states={m}_p={p}_{0}.npy")
         ).to(device)
         test_data = torch.Tensor(
-            io.load_np_array(filename=f"num_states={m}_p={int(100 * p)}_{1}.npy")
+            io.load_np_array(filename=f"num_states={m}_p={p}_{1}.npy")
         ).to(device)
 
         for Model in [

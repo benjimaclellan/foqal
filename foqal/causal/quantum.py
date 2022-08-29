@@ -68,7 +68,7 @@ class QuantumCommonCause(ModelBase):
         return rho
 
     def forward(self):
-        self.clip_params()
+        # self.clip_params()
 
         ex = self.density_operators(self.params["E(X=0|S)"])
         ey = self.density_operators(self.params["E(Y=0|T)"])

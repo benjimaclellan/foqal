@@ -47,11 +47,11 @@ class ClassicalCommonCause(ClassicalProbabilityCausalModel):
 
         self.terms = {
             "P(X=0|SL)": dict(
-                shape=(self.n_settings, self.latent_dim),
+                shape=(2, self.n_settings, self.latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(Y=0|TL)": dict(
-                shape=(self.n_settings, self.latent_dim),
+                shape=(2, self.n_settings, self.latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(L)": dict(
@@ -64,15 +64,21 @@ class ClassicalCommonCause(ClassicalProbabilityCausalModel):
         return
 
     def forward(self):
-        self.clip_params()
+        # self.clip_params()
+        # t = {
+        #     "P(X|SL)": torch.stack(
+        #         [self.params["P(X=0|SL)"], 1.0 - self.params["P(X=0|SL)"]], dim=0
+        #     ),
+        #     "P(Y|TL)": torch.stack(
+        #         [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
+        #     ),
+        #     "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
+        # }
+
         t = {
-            "P(X|SL)": torch.stack(
-                [self.params["P(X=0|SL)"], 1.0 - self.params["P(X=0|SL)"]], dim=0
-            ),
-            "P(Y|TL)": torch.stack(
-                [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
-            ),
-            "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
+            "P(X|SL)": torch.nn.functional.softmax(self.params["P(X=0|SL)"], dim=0),
+            "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
+            "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
         }
 
         pred = torch.sum(
@@ -101,11 +107,11 @@ class Superdeterminism(ClassicalProbabilityCausalModel):
 
         self.terms = {
             "P(X=0|SL)": dict(
-                shape=(n_settings, latent_dim),
+                shape=(2, n_settings, latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(Y=0|TL)": dict(
-                shape=(n_settings, latent_dim),
+                shape=(2, n_settings, latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(S|L)": dict(
@@ -122,18 +128,25 @@ class Superdeterminism(ClassicalProbabilityCausalModel):
         return
 
     def forward(self):
-        self.clip_params()
+        # self.clip_params()
+        # t = {
+        #     "P(X|SL)": torch.stack(
+        #         [self.params["P(X=0|SL)"], 1.0 - self.params["P(X=0|SL)"]], dim=0
+        #     ),
+        #     "P(Y|TL)": torch.stack(
+        #         [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
+        #     ),
+        #     "P(S|L)": (
+        #         self.params["P(S|L)"] / torch.sum(self.params["P(S|L)"], dim=0)[None, :]
+        #     ),
+        #     "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
+        # }
+
         t = {
-            "P(X|SL)": torch.stack(
-                [self.params["P(X=0|SL)"], 1.0 - self.params["P(X=0|SL)"]], dim=0
-            ),
-            "P(Y|TL)": torch.stack(
-                [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
-            ),
-            "P(S|L)": (
-                self.params["P(S|L)"] / torch.sum(self.params["P(S|L)"], dim=0)[None, :]
-            ),
-            "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
+            "P(X|SL)": torch.nn.functional.softmax(self.params["P(X=0|SL)"], dim=0),
+            "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
+            "P(S|L)": torch.nn.functional.softmax(self.params["P(S|L)"], dim=0),
+            "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
         }
 
         num = torch.sum(
@@ -170,11 +183,11 @@ class Superluminal(ClassicalProbabilityCausalModel):
 
         self.terms = {
             "P(X=0|STL)": dict(
-                shape=(n_settings, n_settings, latent_dim),
+                shape=(2, n_settings, n_settings, latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(Y=0|TL)": dict(
-                shape=(n_settings, latent_dim),
+                shape=(2, n_settings, latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(L)": dict(
@@ -187,15 +200,21 @@ class Superluminal(ClassicalProbabilityCausalModel):
         return
 
     def forward(self):
-        self.clip_params()
+        # self.clip_params()
+        # t = {
+        #     "P(X|STL)": torch.stack(
+        #         [self.params["P(X=0|STL)"], 1.0 - self.params["P(X=0|STL)"]], dim=0
+        #     ),
+        #     "P(Y|TL)": torch.stack(
+        #         [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
+        #     ),
+        #     "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
+        # }
+
         t = {
-            "P(X|STL)": torch.stack(
-                [self.params["P(X=0|STL)"], 1.0 - self.params["P(X=0|STL)"]], dim=0
-            ),
-            "P(Y|TL)": torch.stack(
-                [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
-            ),
-            "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
+            "P(X|STL)": torch.nn.functional.softmax(self.params["P(X=0|STL)"], dim=0),
+            "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
+            "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
         }
 
         pred = torch.sum(
@@ -221,11 +240,11 @@ if __name__ == "__main__":
     )
 
     run = 0
-    m = 40
+    m = 20
     p = 0.0
-    latent_dim = 100
+    latent_dim = 30
     n_steps = 1000
-    lr = 0.005
+    lr = 0.05
 
     data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{run}.npy"))
     if use_device:
@@ -235,20 +254,13 @@ if __name__ == "__main__":
 
     for Model in [
         ClassicalCommonCause,
-        # Superdeterminism,
-        # Superluminal,
+        Superdeterminism,
+        Superluminal,
     ]:
         model = Model(n_settings=m, latent_dim=latent_dim)
 
         # for _ in range(3):
         pred = model.forward()
-
-        fig, axs = plt.subplots(nrows=1, ncols=2)
-        k = 5
-        axs[0].imshow(to_numpy(data[:, :, :k, :k]).reshape([4, k**2]))
-        axs[1].imshow(to_numpy(pred[:, :, :k, :k]).reshape([4, k**2]))
-
-        plt.show()
 
         if use_device:
             model = model.to(device)
@@ -272,10 +284,16 @@ if __name__ == "__main__":
 
         torch.cuda.empty_cache()
 
+        # fig, axs = plt.subplots(nrows=1, ncols=2)
+        # k = 5
+        # axs[0].imshow(to_numpy(data[:, :, :k, :k]).reshape([4, k ** 2]))
+        # axs[1].imshow(to_numpy(pred[:, :, :k, :k]).reshape([4, k ** 2]))
+        #
+        # plt.show()
     #%%
     fig, ax = plt.subplots(1, 1)
     for label, losses in training_curves.items():
-        ax.plot(np.arange(len(losses)), np.log(losses), label=f"{label}")
+        ax.plot(np.arange(len(losses)), np.log10(losses), label=f"{label}")
 
     ax.legend()
     plt.show()

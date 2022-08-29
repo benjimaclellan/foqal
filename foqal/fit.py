@@ -30,7 +30,6 @@ def fit(
     :param progress:
     :return:
     """
-
     ls = []
     for step in (pbar := tqdm.tqdm(range(n_steps), disable=(not progress))):
 
