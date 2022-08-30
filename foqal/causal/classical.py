@@ -6,6 +6,8 @@ import numpy as np
 from foqal.model import ModelBase
 from foqal.utils.io import IO
 from foqal.fit import fit, to_numpy
+from foqal.optim import KLDivLoss
+from foqal.causal.quantum import QuantumCommonCause
 
 
 class ClassicalProbabilityCausalModel(ModelBase):
@@ -75,12 +77,6 @@ class ClassicalCommonCause(ClassicalProbabilityCausalModel):
             "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
         }
 
-        # t = {
-        #     "P(X|SL)": torch.nn.functional.softmax(self.params["P(X=0|SL)"], dim=0),
-        #     "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
-        #     "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
-        # }
-
         pred = torch.sum(
             t["P(X|SL)"][:, None, :, None, :]
             * t["P(Y|TL)"][None, :, None, :, :]
@@ -141,13 +137,6 @@ class Superdeterminism(ClassicalProbabilityCausalModel):
             ),
             "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
         }
-
-        # t = {
-        #     "P(X|SL)": torch.nn.functional.softmax(self.params["P(X=0|SL)"], dim=0),
-        #     "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
-        #     "P(S|L)": torch.nn.functional.softmax(self.params["P(S|L)"], dim=0),
-        #     "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
-        # }
 
         num = torch.sum(
             t["P(X|SL)"][:, None, :, None, :]
@@ -211,12 +200,6 @@ class Superluminal(ClassicalProbabilityCausalModel):
             "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
         }
 
-        # t = {
-        #     "P(X|STL)": torch.nn.functional.softmax(self.params["P(X=0|STL)"], dim=0),
-        #     "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
-        #     "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
-        # }
-
         pred = torch.sum(
             t["P(X|STL)"][:, None, :, :, :]
             * t["P(Y|TL)"][None, :, None, :, :]
@@ -235,14 +218,14 @@ if __name__ == "__main__":
     )
 
     run = 0
-    m = 20
-    p = 0.0
+    m = 80
+    p = 0.9
     latent_dim = 30
     n_steps = 300
     lr = 0.25
 
-    data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{run}.npy")).to(device)
-    data_test = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{(run+1)%3}.npy")).to(device)
+    data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_{run}.npy")).to(device)
+    data_test = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_{(run+1)%3}.npy")).to(device)
 
     training_curves = {}
 
@@ -250,8 +233,9 @@ if __name__ == "__main__":
         ClassicalCommonCause,
         Superdeterminism,
         Superluminal,
+        QuantumCommonCause
     ]:
-        model = Model(n_settings=m, latent_dim=latent_dim)
+        model = Model(n_settings=m, latent_dim=latent_dim if Model is not QuantumCommonCause else 2)
 
         # for _ in range(3):
         pred = model.forward()
@@ -259,8 +243,9 @@ if __name__ == "__main__":
         model = model.to(device)
 
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-        loss = torch.nn.MSELoss()
+        # loss = torch.nn.MSELoss()
         # loss = torch.nn.KLDivLoss()
+        loss = KLDivLoss()
 
         t0 = time.time()
         losses = fit(model, data, optimizer, loss, n_steps=n_steps)
@@ -272,7 +257,7 @@ if __name__ == "__main__":
             f"\n{model.__class__.__name__} | "
             f"\n\tTotal time: {time.time() - t0}| "
             f"\n\tTotal parameters: {sum(p.numel() for p in model.parameters())}"
-            f"\n\tTrain loss: {losses[-1]}"
+            f"\n\tTrain loss: {loss(model.forward(), data)}"
             f"\n\tTest loss: {loss(model.forward(), data_test)}"
         )
 

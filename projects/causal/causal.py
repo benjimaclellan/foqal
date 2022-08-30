@@ -3,8 +3,8 @@ import itertools
 import tqdm
 import pandas as pd
 import torch
-from torch.functional import F
 
+from foqal import optim
 from foqal.utils.io import IO
 from foqal.utils import to_numpy
 from foqal.causal.classical import ClassicalCommonCause, Superdeterminism, Superluminal
@@ -17,14 +17,13 @@ if __name__ == "__main__":
     device = "cuda"
 
     io = IO.directory(
-        # folder="entangled-state-data",
-        folder="ibmq-simulator_bell-state_local-projections_depolarized-channel",
+        folder="entangled-state-data",
+        # folder="ibmq-simulator_bell-state_local-projections_depolarized-channel",
         include_date=False,
         include_id=False,
         verbose=False,
     )
 
-    # ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
     ps = (
         0.0,
         0.1,
@@ -74,7 +73,8 @@ if __name__ == "__main__":
             model = model.to(device)
 
             optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
-            loss = torch.nn.MSELoss()
+            # loss = optim.MSELoss()
+            loss = optim.KLDivLoss()
 
             t0 = time.time()
             losses = fit(model, train_data, optimizer, loss, n_steps=n_steps, progress=False)

@@ -102,6 +102,8 @@ def model_comparison(df: pd.DataFrame):
     # config.save_figure(fig, "fig_causal_discovery_simulations_n_measurements")
     plt.show()
 
+    return fig, axs
+
 
 if __name__ == "__main__":
     io = IO.directory(

@@ -43,7 +43,7 @@ def fit(
         ls.append(to_numpy(l))
 
         if progress:
-            pbar.set_description(f"Cost: {ls[-1]:.10f}")
+            pbar.set_description(f"Cost: {l:.10f}")
 
     return ls
 
