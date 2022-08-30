@@ -3,12 +3,7 @@ import tqdm
 import numpy as np
 import pandas as pd
 
-
-def to_numpy(tensor):
-    if tensor.is_cuda:
-        return tensor.cpu().detach().numpy()
-    else:
-        return tensor.detach().numpy()
+from foqal.utils import to_numpy
 
 
 def fit(

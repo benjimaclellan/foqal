@@ -228,12 +228,7 @@ class Superluminal(ClassicalProbabilityCausalModel):
 
 
 if __name__ == "__main__":
-    use_device = True
-
-    print(f"CUDA is available: {torch.cuda.is_available()}")
-    print(f"Number of devices: {torch.cuda.device_count()}")
-    print(f"Current device: {torch.cuda.get_device_name(0)}")
-    device = torch.cuda.current_device()
+    device = "cpu"
 
     io = IO.directory(
         folder="entangled-state-data", include_date=False, include_id=False
@@ -243,12 +238,11 @@ if __name__ == "__main__":
     m = 20
     p = 0.0
     latent_dim = 30
-    n_steps = 1000
-    lr = 0.05
+    n_steps = 300
+    lr = 0.25
 
-    data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{run}.npy"))
-    if use_device:
-        data = data.to(device)
+    data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{run}.npy")).to(device)
+    data_test = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_run{(run+1)%3}.npy")).to(device)
 
     training_curves = {}
 
@@ -262,8 +256,7 @@ if __name__ == "__main__":
         # for _ in range(3):
         pred = model.forward()
 
-        if use_device:
-            model = model.to(device)
+        model = model.to(device)
 
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
         loss = torch.nn.MSELoss()
@@ -271,7 +264,7 @@ if __name__ == "__main__":
 
         t0 = time.time()
         losses = fit(model, data, optimizer, loss, n_steps=n_steps)
-        pred = model.forward()
+        test = model.forward()
 
         training_curves[model.__class__.__name__] = losses
 
@@ -279,7 +272,8 @@ if __name__ == "__main__":
             f"\n{model.__class__.__name__} | "
             f"\n\tTotal time: {time.time() - t0}| "
             f"\n\tTotal parameters: {sum(p.numel() for p in model.parameters())}"
-            f"\n\tFinal loss: {losses[-1]}"
+            f"\n\tTrain loss: {losses[-1]}"
+            f"\n\tTest loss: {loss(model.forward(), data_test)}"
         )
 
         torch.cuda.empty_cache()
@@ -293,7 +287,8 @@ if __name__ == "__main__":
     #%%
     fig, ax = plt.subplots(1, 1)
     for label, losses in training_curves.items():
-        ax.plot(np.arange(len(losses)), np.log10(losses), label=f"{label}")
+        ax.plot(np.arange(len(losses)), losses, label=f"{label}")
+        ax.set_yscale('log')
 
     ax.legend()
     plt.show()

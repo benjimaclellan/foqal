@@ -6,6 +6,7 @@ import torch
 from torch.functional import F
 
 from foqal.utils.io import IO
+from foqal.utils import to_numpy
 from foqal.causal.classical import ClassicalCommonCause, Superdeterminism, Superluminal
 from foqal.causal.quantum import QuantumCommonCause
 from foqal.fit import fit
@@ -38,11 +39,10 @@ if __name__ == "__main__":
         1.0,
     )
     ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80)
-    ks = 5
 
-    latent_dim = 50
+    latent_dim = 100
     lr = 0.25
-    n_steps = 500
+    n_steps = 1000
 
     q = list(itertools.product(ms, ps))
 
@@ -53,10 +53,10 @@ if __name__ == "__main__":
         pbar.set_description(f"m={m} | p={p}")
 
         train_data = torch.Tensor(
-            io.load_np_array(filename=f"num_states={m}_p={p}_{0}.npy")
+            io.load_np_array(filename=f"m={m}_p={p}_{0}.npy")
         ).to(device)
         test_data = torch.Tensor(
-            io.load_np_array(filename=f"num_states={m}_p={p}_{1}.npy")
+            io.load_np_array(filename=f"m={m}_p={p}_{1}.npy")
         ).to(device)
 
         for Model in [
@@ -74,19 +74,15 @@ if __name__ == "__main__":
             model = model.to(device)
 
             optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
-            loss = torch.nn.KLDivLoss()
+            loss = torch.nn.MSELoss()
 
             t0 = time.time()
             losses = fit(model, train_data, optimizer, loss, n_steps=n_steps, progress=False)
             t1 = time.time()
 
-            torch.cuda.empty_cache()
-
-            loss_test = loss(model.forward(), test_data)
-            if loss_test.is_cuda:
-                loss_test = loss_test.cpu().detach().numpy().item()
-            else:
-                loss_test = loss_test.detach().numpy().item()
+            # torch.cuda.empty_cache()
+            loss_train = to_numpy(loss(model.forward(), train_data))
+            loss_test = to_numpy(loss(model.forward(), test_data))
 
             df.append(
                 dict(
@@ -94,7 +90,7 @@ if __name__ == "__main__":
                     m=m,
                     p=p,
                     latent_dim=_latent_dim,
-                    train_loss=losses[-1].item(),
+                    train_loss=loss_train,
                     test_loss=loss_test,
                     t=(t1 - t0),
                     lr=lr,
