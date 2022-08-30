@@ -14,9 +14,6 @@ def model_comparison(df: pd.DataFrame):
     config = StyleConfig()  # useful for consistent plot types, colors, styles, etc.
     verbose = False
 
-    # io = IO(path=paths.path_main.joinpath(paths.paths_simulations['num_measurements']))  # this is the good dataset
-    # df = io.load_dataframe("model-performance.txt")
-
     names = {  # label to give to each model in the legend
         "ClassicalCommonCauseModel": 'CCK',
         "SuperluminalModel": "SL",
@@ -68,7 +65,6 @@ def model_comparison(df: pd.DataFrame):
 
             cmap = plt.get_cmap(c)
             # norm = m * m * 4
-            norm = 1
 
             l, = axs[0].plot(ps, train, ls='-', color=cmap(scale(m)), label=" ")  # label=f"{m}")
             lines.append(l)
@@ -97,10 +93,6 @@ def model_comparison(df: pd.DataFrame):
     for vpack in leg._legend_handle_box.get_children():
         for hpack in vpack.get_children()[:1]:
             hpack.get_children()[0].set_width(0)
-
-    # save and show the figure
-    # config.save_figure(fig, "fig_causal_discovery_simulations_n_measurements")
-    plt.show()
 
     return fig, axs
 

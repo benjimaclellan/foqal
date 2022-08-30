@@ -39,23 +39,24 @@ if __name__ == "__main__":
     )
     ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80)
 
+    ks = (0, 1, 2)
     latent_dim = 100
-    lr = 0.25
-    n_steps = 1000
+    lr = 0.15
+    n_steps = 1500
 
-    q = list(itertools.product(ms, ps))
+    q = list(itertools.product(ms, ps, ks))
 
     verbose, show = False, False
     df = []
     for i in (pbar := tqdm.tqdm(range(len(q)))):
-        (m, p) = q[i]
-        pbar.set_description(f"m={m} | p={p}")
+        (m, p, k) = q[i]
+        pbar.set_description(f"m={m} | p={p} | k={k}")
 
         train_data = torch.Tensor(
-            io.load_np_array(filename=f"m={m}_p={p}_{0}.npy")
+            io.load_np_array(filename=f"m={m}_p={p}_{k}.npy")
         ).to(device)
         test_data = torch.Tensor(
-            io.load_np_array(filename=f"m={m}_p={p}_{1}.npy")
+            io.load_np_array(filename=f"m={m}_p={p}_{(k+1)%len(ks)}.npy")
         ).to(device)
 
         for Model in [
@@ -92,6 +93,8 @@ if __name__ == "__main__":
                     latent_dim=_latent_dim,
                     train_loss=loss_train,
                     test_loss=loss_test,
+                    kl_test_train=to_numpy(loss(train_data, test_data)),
+                    k=k,
                     t=(t1 - t0),
                     lr=lr,
                     n_steps=n_steps,
