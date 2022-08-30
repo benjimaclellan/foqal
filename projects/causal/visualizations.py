@@ -1,16 +1,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
-
 import pandas as pd
 
 from foqal.utils.io import IO
-
 from foqal.utils.style import StyleConfig
 
 
 def model_comparison(df: pd.DataFrame):
+    """
+    Generates a plot of test & train losses for classical & quantum causal models, as a function of depolarizing
+    coefficient, p (x-axis) and number of measurements (line color).
 
+    :param df: pandas.DataFrame containing all the regression results.
+    :return:
+    """
     config = StyleConfig()  # useful for consistent plot types, colors, styles, etc.
     verbose = False
 
@@ -21,14 +25,14 @@ def model_comparison(df: pd.DataFrame):
          "QuantumCommonCauseModel": 'qCC',
     }
 
-    fig, axs = config.grid_axes(nrows=2, ncols=1, width_ax=90, height_ax=30, left=25, right=55, bottom=15, top=5,
-                                width_space=10, height_space=5, sharex=True, sharey=False, squeeze=True)
+    fig, axs = config.grid_axes(nrows=2, ncols=1, width_ax=100, height_ax=20, left=25, right=55, bottom=15, top=5,
+                                width_space=0, height_space=25, sharex=True, sharey=False, squeeze=True)
 
     ms = df['m'].unique()
     ps = df['p'].unique()
 
     def scale(m):
-        k = 0.8
+        k = 0.6
         return ((m - np.min(ms)) / (np.max(ms) - np.min(ms))) * k + (1 - k) / 2
 
     models = [
@@ -52,7 +56,6 @@ def model_comparison(df: pd.DataFrame):
                          & (df['m'] == m)
                          & (df['p'] == p)
                          ]
-                # row = dfj[dfj['train_loss'] == dfj['train_loss'].min()]
 
                 if verbose:
                     print(model, p)
@@ -64,18 +67,13 @@ def model_comparison(df: pd.DataFrame):
                 test.append(dfi[f'test_loss'].min())
 
             cmap = plt.get_cmap(c)
-            # norm = m * m * 4
 
-            l, = axs[0].plot(ps, train, ls='-', color=cmap(scale(m)), label=" ")  # label=f"{m}")
+            l, = axs[0].plot(ps, train, ls='-', color=cmap(scale(m)), label=" ")
             lines.append(l)
 
-            axs[1].plot(ps, test, ls='--', color=cmap(scale(m)))  # , label=f"Test: {model} MEAN")
-
+            axs[1].plot(ps, test, ls='--', color=cmap(scale(m)))
     axs[0].set(ylabel="Training error")
     axs[1].set(xlabel=r"Depolarizing coefficient, $p$", ylabel="Test error")
-
-    for ax in axs:
-        ax.set(ylim=[0, 0.0001])
 
     # messing around with the legend
     def flip(items, ncol):
@@ -100,7 +98,6 @@ def model_comparison(df: pd.DataFrame):
 if __name__ == "__main__":
     io = IO.directory(
         folder="ibmq-simulator_bell-state_local-projections_depolarized-channel",
-        # folder="2022-08-23_cross_val_5ccc",
         include_date=False, include_id=False, verbose=False,
     )
 

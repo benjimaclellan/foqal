@@ -5,7 +5,9 @@ import seaborn as sns
 import pathlib
 
 
-path_style = pathlib.Path(__file__).parent.joinpath("fig.mplstyle")  # path to the matplotlib style guide
+path_style = pathlib.Path(__file__).parent.joinpath(
+    "fig.mplstyle"
+)  # path to the matplotlib style guide
 path_renders = pathlib.Path(__file__).parent.parent.parent.joinpath("renders")
 
 
@@ -33,14 +35,14 @@ class StyleConfig(object):
         self.force_dpi = True
 
         # output settings
-        self.fig_exts = ['pdf', 'png']
+        self.fig_exts = ["pdf", "png"]
         self.save_dir = path_renders
 
         # various kw_arg style dictionaries
         self.fill_style = dict(alpha=0.5)
-        self.line_style = dict(alpha=1.0, ls='-')
+        self.line_style = dict(alpha=1.0, ls="-")
         self.pmesh_style = dict(rasterized=True)
-        self.contour_style = dict(linewidths=1.75, alpha=1.0, linestyles='-')
+        self.contour_style = dict(linewidths=1.75, alpha=1.0, linestyles="-")
 
         return
 
@@ -48,7 +50,9 @@ class StyleConfig(object):
     def mm2in(val):
         return val / 25.4
 
-    def figure_single_axis(self, width_ax=60, height_ax=30, left=15, right=5, bottom=15, top=5):
+    def figure_single_axis(
+        self, width_ax=60, height_ax=30, left=15, right=5, bottom=15, top=5
+    ):
         """
         Creates a figure with one axis, where the axis size can be precisely set and the figure is based accordingly
         :param width_ax: width of the axis (not figure) in mm
@@ -59,26 +63,65 @@ class StyleConfig(object):
         :param bottom: bottom margin for the axis
         :return:
         """
-        fig = plt.figure(figsize=[self.mm2in(width_ax + left + right), self.mm2in(height_ax + top + bottom)])
-        hor = [Size.Fixed(self.mm2in(left)), Size.Fixed(self.mm2in(width_ax)), Size.Fixed(self.mm2in(right))]
-        ver = [Size.Fixed(self.mm2in(bottom)), Size.Fixed(self.mm2in(height_ax)), Size.Fixed(self.mm2in(top))]
+        fig = plt.figure(
+            figsize=[
+                self.mm2in(width_ax + left + right),
+                self.mm2in(height_ax + top + bottom),
+            ]
+        )
+        hor = [
+            Size.Fixed(self.mm2in(left)),
+            Size.Fixed(self.mm2in(width_ax)),
+            Size.Fixed(self.mm2in(right)),
+        ]
+        ver = [
+            Size.Fixed(self.mm2in(bottom)),
+            Size.Fixed(self.mm2in(height_ax)),
+            Size.Fixed(self.mm2in(top)),
+        ]
 
         divider = Divider(fig, (0, 0, 1, 1), hor, ver, aspect=False)
-        ax = fig.add_axes(divider.get_position(), axes_locator=divider.new_locator(nx=1, ny=1))
+        ax = fig.add_axes(
+            divider.get_position(), axes_locator=divider.new_locator(nx=1, ny=1)
+        )
         return fig, ax
 
-    def add_axis(self, fig, width_ax=60, height_ax=30, left=15, right=5, bottom=15, top=5):
-        hor = [Size.Fixed(self.mm2in(left)), Size.Fixed(self.mm2in(width_ax)), Size.Fixed(self.mm2in(right))]
-        ver = [Size.Fixed(self.mm2in(bottom)), Size.Fixed(self.mm2in(height_ax)), Size.Fixed(self.mm2in(top))]
+    def add_axis(
+        self, fig, width_ax=60, height_ax=30, left=15, right=5, bottom=15, top=5
+    ):
+        hor = [
+            Size.Fixed(self.mm2in(left)),
+            Size.Fixed(self.mm2in(width_ax)),
+            Size.Fixed(self.mm2in(right)),
+        ]
+        ver = [
+            Size.Fixed(self.mm2in(bottom)),
+            Size.Fixed(self.mm2in(height_ax)),
+            Size.Fixed(self.mm2in(top)),
+        ]
 
         divider = Divider(fig, (0, 0, 1, 1), hor, ver, aspect=False)
-        ax = fig.add_axes(divider.get_position(), axes_locator=divider.new_locator(nx=1, ny=1))
+        ax = fig.add_axes(
+            divider.get_position(), axes_locator=divider.new_locator(nx=1, ny=1)
+        )
         return ax
 
-    def grid_axes(self, nrows=3, ncols=3, width_ax=30, height_ax=30,
-                  left=15, right=5, bottom=15, top=5,
-                  width_space=10, height_space=10,
-                  sharex=False, sharey=False, squeeze=True):
+    def grid_axes(
+        self,
+        nrows=3,
+        ncols=3,
+        width_ax=30,
+        height_ax=30,
+        left=15,
+        right=5,
+        bottom=15,
+        top=5,
+        width_space=10,
+        height_space=10,
+        sharex=False,
+        sharey=False,
+        squeeze=True,
+    ):
 
         fig_width = ncols * (width_ax + width_space) + left + right
         fig_height = nrows * (height_ax + height_space) + top + bottom
@@ -91,12 +134,22 @@ class StyleConfig(object):
         width_space = width_space / fig_height
         height_space = height_space / fig_height
 
-        fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=[self.mm2in(fig_width), self.mm2in(fig_height)],
-                                sharex=sharex, sharey=sharey, squeeze=squeeze,
-                                gridspec_kw=dict(
-                                    left=left, bottom=bottom, right=right, top=top,
-                                    wspace=width_space, hspace=height_space,
-                                ))
+        fig, axs = plt.subplots(
+            nrows=nrows,
+            ncols=ncols,
+            figsize=[self.mm2in(fig_width), self.mm2in(fig_height)],
+            sharex=sharex,
+            sharey=sharey,
+            squeeze=squeeze,
+            gridspec_kw=dict(
+                left=left,
+                bottom=bottom,
+                right=right,
+                top=top,
+                wspace=width_space,
+                hspace=height_space,
+            ),
+        )
         return fig, axs
 
     @staticmethod
@@ -107,19 +160,39 @@ class StyleConfig(object):
         return
 
     def save_figure(self, fig, filename):
-        kwargs = {'dpi': self.dpi, 'transparent': True}
-        metadata = {'Author': 'Satchel Armena, Benjamin MacLellan', 'Subject': "IQC causal adjudication figures"}
+        kwargs = {"dpi": self.dpi, "transparent": True}
+        metadata = {
+            "Author": "Benjamin MacLellan",
+            "Subject": "QOQI causal model selection",
+        }
         self.save_dir.joinpath(filename).parent.mkdir(parents=True, exist_ok=True)
 
         # adds a rasterized, (almost) transparent rectangle below all layers to force the DPI when importing in Affinity
         if self.force_dpi:
-            fig.patches.extend([plt.Rectangle((0.5, 0.5), 0.1, 0.1,
-                                              fill=True, color='w', alpha=0.01, zorder=-999, rasterized=True,
-                                              transform=fig.transFigure)])
-        print(f'Saving to {str(self.save_dir.joinpath(filename))}')
+            fig.patches.extend(
+                [
+                    plt.Rectangle(
+                        (0.5, 0.5),
+                        0.1,
+                        0.1,
+                        fill=True,
+                        color="w",
+                        alpha=0.01,
+                        zorder=-999,
+                        rasterized=True,
+                        transform=fig.transFigure,
+                    )
+                ]
+            )
+        print(f"Saving to {str(self.save_dir.joinpath(filename))}")
         for ext in self.fig_exts:
-            fig.savefig(self.save_dir.joinpath(filename + '.' + ext),
-                        bbox_inches=self.bbox_inches, format=ext, metadata=metadata, **kwargs)
+            fig.savefig(
+                self.save_dir.joinpath(filename + "." + ext),
+                bbox_inches=self.bbox_inches,
+                format=ext,
+                metadata=metadata,
+                **kwargs,
+            )
         return
 
 
@@ -131,7 +204,9 @@ class ColorManager(object):
 
     def __init__(self):
         self.cat = sns.color_palette()
-        self.map = sns.cubehelix_palette(start=.0, rot=-0.75, reverse=False, as_cmap=True)
+        self.map = sns.cubehelix_palette(
+            start=0.0, rot=-0.75, reverse=False, as_cmap=True
+        )
         self.pairs = sns.color_palette("Paired")
 
         # matplotlib.rcParams['axes.prop_cycle'] = cycler('color', self.cat)

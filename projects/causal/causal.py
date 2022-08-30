@@ -12,6 +12,10 @@ from foqal.causal.quantum import QuantumCommonCause
 from foqal.fit import fit
 
 
+"""
+Main regression script for fitting causal models to measurement data of depolarized Bell states.
+"""
+
 if __name__ == "__main__":
     print(f"CUDA is available: {torch.cuda.is_available()}")
     device = "cuda"
@@ -37,12 +41,12 @@ if __name__ == "__main__":
         0.9,
         1.0,
     )
-    ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80)
+    ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
 
-    ks = (0, 1, 2)
+    ks = (0, 1, 2, 0, 1, 2)
     latent_dim = 100
-    lr = 0.15
-    n_steps = 1500
+    lr = 0.10
+    n_steps = 2000
 
     q = list(itertools.product(ms, ps, ks))
 
@@ -74,14 +78,12 @@ if __name__ == "__main__":
             model = model.to(device)
 
             optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
-            # loss = optim.MSELoss()
             loss = optim.KLDivLoss()
 
             t0 = time.time()
             losses = fit(model, train_data, optimizer, loss, n_steps=n_steps, progress=False)
             t1 = time.time()
 
-            # torch.cuda.empty_cache()
             loss_train = to_numpy(loss(model.forward(), train_data))
             loss_test = to_numpy(loss(model.forward(), test_data))
 

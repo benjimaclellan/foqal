@@ -25,6 +25,7 @@ class IO:
 
     # default save path always points to ../data no matter where this repository is located
     default_path = pathlib.Path(__file__).parent.parent.parent.joinpath("data")
+    render_path = pathlib.Path(__file__).parent.parent.parent.joinpath("renders")
 
     def __init__(self, path=None, verbose=True):
         self.verbose = verbose

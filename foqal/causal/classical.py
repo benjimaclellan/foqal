@@ -225,7 +225,9 @@ if __name__ == "__main__":
     lr = 0.25
 
     data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_{run}.npy")).to(device)
-    data_test = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_{(run+1)%3}.npy")).to(device)
+    data_test = torch.Tensor(
+        io.load_np_array(filename=f"m={m}_p={p}_{(run+1)%3}.npy")
+    ).to(device)
 
     training_curves = {}
 
@@ -233,9 +235,12 @@ if __name__ == "__main__":
         ClassicalCommonCause,
         Superdeterminism,
         Superluminal,
-        QuantumCommonCause
+        QuantumCommonCause,
     ]:
-        model = Model(n_settings=m, latent_dim=latent_dim if Model is not QuantumCommonCause else 2)
+        model = Model(
+            n_settings=m,
+            latent_dim=latent_dim if Model is not QuantumCommonCause else 2,
+        )
 
         # for _ in range(3):
         pred = model.forward()
@@ -273,7 +278,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(1, 1)
     for label, losses in training_curves.items():
         ax.plot(np.arange(len(losses)), losses, label=f"{label}")
-        ax.set_yscale('log')
+        ax.set_yscale("log")
 
     ax.legend()
     plt.show()
