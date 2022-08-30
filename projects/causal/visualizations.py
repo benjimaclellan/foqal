@@ -19,17 +19,30 @@ def model_comparison(df: pd.DataFrame):
     verbose = False
 
     names = {  # label to give to each model in the legend
-        "ClassicalCommonCauseModel": 'CCK',
+        "ClassicalCommonCauseModel": "CCK",
         "SuperluminalModel": "SL",
         "SuperdeterminismModel": "SD",
-         "QuantumCommonCauseModel": 'qCC',
+        "QuantumCommonCauseModel": "qCC",
     }
 
-    fig, axs = config.grid_axes(nrows=2, ncols=1, width_ax=100, height_ax=20, left=25, right=55, bottom=15, top=5,
-                                width_space=0, height_space=25, sharex=True, sharey=False, squeeze=True)
+    fig, axs = config.grid_axes(
+        nrows=2,
+        ncols=1,
+        width_ax=100,
+        height_ax=20,
+        left=25,
+        right=55,
+        bottom=15,
+        top=5,
+        width_space=0,
+        height_space=25,
+        sharex=True,
+        sharey=False,
+        squeeze=True,
+    )
 
-    ms = df['m'].unique()
-    ps = df['p'].unique()
+    ms = df["m"].unique()
+    ps = df["p"].unique()
 
     def scale(m):
         k = 0.6
@@ -47,31 +60,29 @@ def model_comparison(df: pd.DataFrame):
     lines += [axs[0].plot([], marker="", ls="", label=name) for name in names.values()]
 
     for m in ms:
-        lines += [axs[0].plot([], marker="", ls="", label=r"$m$="+f"{m} \t")]
+        lines += [axs[0].plot([], marker="", ls="", label=r"$m$=" + f"{m} \t")]
         for model, c in zip(models, colors):
             train, test = [], []
             for p in ps:
                 latent_dim = 50
-                dfj = df[(df['model'] == model)
-                         & (df['m'] == m)
-                         & (df['p'] == p)
-                         ]
+                dfj = df[(df["model"] == model) & (df["m"] == m) & (df["p"] == p)]
 
                 if verbose:
                     print(model, p)
                     print(latent_dim)
                     print(dfj.shape[0])
 
-                dfi = df[(df['model'] == model) & (df['m'] == m) & (df['p'] == p)]
-                train.append(dfi[f'train_loss'].min())
-                test.append(dfi[f'test_loss'].min())
+                dfi = df[(df["model"] == model) & (df["m"] == m) & (df["p"] == p)]
+                dfj = dfi[(dfi["train_loss"] == dfi["train_loss"].min())]
+                train.append(dfj[f"train_loss"].mean())
+                test.append(dfj[f"test_loss"].mean())
 
             cmap = plt.get_cmap(c)
 
-            l, = axs[0].plot(ps, train, ls='-', color=cmap(scale(m)), label=" ")
+            (l,) = axs[0].plot(ps, train, ls="-", color=cmap(scale(m)), label=" ")
             lines.append(l)
 
-            axs[1].plot(ps, test, ls='--', color=cmap(scale(m)))
+            axs[1].plot(ps, test, ls="--", color=cmap(scale(m)))
     axs[0].set(ylabel="Training error")
     axs[1].set(xlabel=r"Depolarizing coefficient, $p$", ylabel="Test error")
 
@@ -80,12 +91,16 @@ def model_comparison(df: pd.DataFrame):
         return itertools.chain(*[items[i::ncol] for i in range(ncol)])
 
     handles, labels = axs[0].get_legend_handles_labels()
-    leg = axs[0].legend(flip(handles, 5), flip(labels, 5),
-                        ncol=5,
-                        handletextpad=0.1,
-                        columnspacing=0.3,
-                        labelspacing=0.1,
-                        bbox_to_anchor=(0.95, 0), loc="center left")
+    leg = axs[0].legend(
+        flip(handles, 5),
+        flip(labels, 5),
+        ncol=5,
+        handletextpad=0.1,
+        columnspacing=0.3,
+        labelspacing=0.1,
+        bbox_to_anchor=(0.95, 0),
+        loc="center left",
+    )
     leg._legend_box.align = "center"
 
     for vpack in leg._legend_handle_box.get_children():
@@ -98,7 +113,9 @@ def model_comparison(df: pd.DataFrame):
 if __name__ == "__main__":
     io = IO.directory(
         folder="ibmq-simulator_bell-state_local-projections_depolarized-channel",
-        include_date=False, include_id=False, verbose=False,
+        include_date=False,
+        include_id=False,
+        verbose=False,
     )
 
     df = io.load_dataframe("model_summary.txt")

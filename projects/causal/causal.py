@@ -56,9 +56,9 @@ if __name__ == "__main__":
         (m, p, k) = q[i]
         pbar.set_description(f"m={m} | p={p} | k={k}")
 
-        train_data = torch.Tensor(
-            io.load_np_array(filename=f"m={m}_p={p}_{k}.npy")
-        ).to(device)
+        train_data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_{k}.npy")).to(
+            device
+        )
         test_data = torch.Tensor(
             io.load_np_array(filename=f"m={m}_p={p}_{(k+1)%len(ks)}.npy")
         ).to(device)
@@ -81,7 +81,9 @@ if __name__ == "__main__":
             loss = optim.KLDivLoss()
 
             t0 = time.time()
-            losses = fit(model, train_data, optimizer, loss, n_steps=n_steps, progress=False)
+            losses = fit(
+                model, train_data, optimizer, loss, n_steps=n_steps, progress=False
+            )
             t1 = time.time()
 
             loss_train = to_numpy(loss(model.forward(), train_data))

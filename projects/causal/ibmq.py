@@ -80,11 +80,11 @@ ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
 ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 
 io = IO.directory(
-        folder="ibmq-simulator_bell-state_local-projections_depolarized-channel",
-        verbose=True,
-        include_date=False,
-        include_id=False,
-    )
+    folder="ibmq-simulator_bell-state_local-projections_depolarized-channel",
+    verbose=True,
+    include_date=False,
+    include_id=False,
+)
 
 # Here we will create a list of results for each different value of p
 circuits = []
@@ -107,9 +107,7 @@ for m in ms:
 
                 job = execute(circ, Aer.get_backend("qasm_simulator"), shots=10000)
                 counts = trace_out_ancillae(job.result().get_counts())
-                print(
-                    f"m={m}, p={p}, k={k}| i={i}, j={j} | {counts}"
-                )
+                print(f"m={m}, p={p}, k={k}| i={i}, j={j} | {counts}")
 
                 data[0, 0, i, j] = counts["00"]
                 data[0, 1, i, j] = counts["10"]
