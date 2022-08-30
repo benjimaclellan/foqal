@@ -79,7 +79,7 @@ def model_comparison(df: pd.DataFrame):
     axs[1].set(xlabel=r"Depolarizing coefficient, $p$", ylabel="Test error")
 
     for ax in axs:
-        ax.set(ylim=[0, 0.0003])
+        ax.set(ylim=[0, 0.0001])
 
     # messing around with the legend
     def flip(items, ncol):

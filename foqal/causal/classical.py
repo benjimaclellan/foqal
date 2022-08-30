@@ -47,11 +47,11 @@ class ClassicalCommonCause(ClassicalProbabilityCausalModel):
 
         self.terms = {
             "P(X=0|SL)": dict(
-                shape=(2, self.n_settings, self.latent_dim),
+                shape=(self.n_settings, self.latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(Y=0|TL)": dict(
-                shape=(2, self.n_settings, self.latent_dim),
+                shape=(self.n_settings, self.latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(L)": dict(
@@ -64,22 +64,22 @@ class ClassicalCommonCause(ClassicalProbabilityCausalModel):
         return
 
     def forward(self):
-        # self.clip_params()
-        # t = {
-        #     "P(X|SL)": torch.stack(
-        #         [self.params["P(X=0|SL)"], 1.0 - self.params["P(X=0|SL)"]], dim=0
-        #     ),
-        #     "P(Y|TL)": torch.stack(
-        #         [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
-        #     ),
-        #     "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
-        # }
-
+        self.clip_params()
         t = {
-            "P(X|SL)": torch.nn.functional.softmax(self.params["P(X=0|SL)"], dim=0),
-            "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
-            "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
+            "P(X|SL)": torch.stack(
+                [self.params["P(X=0|SL)"], 1.0 - self.params["P(X=0|SL)"]], dim=0
+            ),
+            "P(Y|TL)": torch.stack(
+                [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
+            ),
+            "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
         }
+
+        # t = {
+        #     "P(X|SL)": torch.nn.functional.softmax(self.params["P(X=0|SL)"], dim=0),
+        #     "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
+        #     "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
+        # }
 
         pred = torch.sum(
             t["P(X|SL)"][:, None, :, None, :]
@@ -107,11 +107,11 @@ class Superdeterminism(ClassicalProbabilityCausalModel):
 
         self.terms = {
             "P(X=0|SL)": dict(
-                shape=(2, n_settings, latent_dim),
+                shape=(n_settings, latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(Y=0|TL)": dict(
-                shape=(2, n_settings, latent_dim),
+                shape=(n_settings, latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(S|L)": dict(
@@ -128,26 +128,26 @@ class Superdeterminism(ClassicalProbabilityCausalModel):
         return
 
     def forward(self):
-        # self.clip_params()
-        # t = {
-        #     "P(X|SL)": torch.stack(
-        #         [self.params["P(X=0|SL)"], 1.0 - self.params["P(X=0|SL)"]], dim=0
-        #     ),
-        #     "P(Y|TL)": torch.stack(
-        #         [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
-        #     ),
-        #     "P(S|L)": (
-        #         self.params["P(S|L)"] / torch.sum(self.params["P(S|L)"], dim=0)[None, :]
-        #     ),
-        #     "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
-        # }
-
+        self.clip_params()
         t = {
-            "P(X|SL)": torch.nn.functional.softmax(self.params["P(X=0|SL)"], dim=0),
-            "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
-            "P(S|L)": torch.nn.functional.softmax(self.params["P(S|L)"], dim=0),
-            "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
+            "P(X|SL)": torch.stack(
+                [self.params["P(X=0|SL)"], 1.0 - self.params["P(X=0|SL)"]], dim=0
+            ),
+            "P(Y|TL)": torch.stack(
+                [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
+            ),
+            "P(S|L)": (
+                self.params["P(S|L)"] / torch.sum(self.params["P(S|L)"], dim=0)[None, :]
+            ),
+            "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
         }
+
+        # t = {
+        #     "P(X|SL)": torch.nn.functional.softmax(self.params["P(X=0|SL)"], dim=0),
+        #     "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
+        #     "P(S|L)": torch.nn.functional.softmax(self.params["P(S|L)"], dim=0),
+        #     "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
+        # }
 
         num = torch.sum(
             t["P(X|SL)"][:, None, :, None, :]
@@ -183,11 +183,11 @@ class Superluminal(ClassicalProbabilityCausalModel):
 
         self.terms = {
             "P(X=0|STL)": dict(
-                shape=(2, n_settings, n_settings, latent_dim),
+                shape=(n_settings, n_settings, latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(Y=0|TL)": dict(
-                shape=(2, n_settings, latent_dim),
+                shape=(n_settings, latent_dim),
                 bounds=self.prob_bounds,
             ),
             "P(L)": dict(
@@ -200,22 +200,22 @@ class Superluminal(ClassicalProbabilityCausalModel):
         return
 
     def forward(self):
-        # self.clip_params()
-        # t = {
-        #     "P(X|STL)": torch.stack(
-        #         [self.params["P(X=0|STL)"], 1.0 - self.params["P(X=0|STL)"]], dim=0
-        #     ),
-        #     "P(Y|TL)": torch.stack(
-        #         [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
-        #     ),
-        #     "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
-        # }
-
+        self.clip_params()
         t = {
-            "P(X|STL)": torch.nn.functional.softmax(self.params["P(X=0|STL)"], dim=0),
-            "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
-            "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
+            "P(X|STL)": torch.stack(
+                [self.params["P(X=0|STL)"], 1.0 - self.params["P(X=0|STL)"]], dim=0
+            ),
+            "P(Y|TL)": torch.stack(
+                [self.params["P(Y=0|TL)"], 1.0 - self.params["P(Y=0|TL)"]], dim=0
+            ),
+            "P(L)": self.params["P(L)"] / torch.sum(self.params["P(L)"]),
         }
+
+        # t = {
+        #     "P(X|STL)": torch.nn.functional.softmax(self.params["P(X=0|STL)"], dim=0),
+        #     "P(Y|TL)": torch.nn.functional.softmax(self.params["P(Y=0|TL)"], dim=0),
+        #     "P(L)": torch.nn.functional.softmax(self.params["P(L)"], dim=0),
+        # }
 
         pred = torch.sum(
             t["P(X|STL)"][:, None, :, :, :]
