@@ -28,10 +28,10 @@ def model_comparison(df: pd.DataFrame):
     fig, axs = config.grid_axes(
         nrows=2,
         ncols=1,
-        width_ax=100,
+        width_ax=70,
         height_ax=20,
         left=25,
-        right=55,
+        right=5,
         bottom=15,
         top=5,
         width_space=0,

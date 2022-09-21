@@ -137,5 +137,5 @@ data/
 .figures/
 
 analysis/
-
-renders/
+figures/
+figures/renders/

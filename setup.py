@@ -84,7 +84,7 @@ extras_require = {
 setuptools.setup(
     name="foqal",
     version=version_file["__version__"],
-    description="Foils of quantum theory using automatic learning.",
+    description="Differentiable model selection in quantum theory",
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
@@ -105,7 +105,7 @@ setuptools.setup(
     extras_require=extras_require,
     include_package_data=True,
     url="http://github.com/benjimaclellan/foqal",
-    author="PIQuIL",
+    author="Benjamin MacLellan",
     author_email="benjamin.maclellan@uwaterloo.ca",
     license="Apache License 2.0",
     packages=setuptools.find_packages(exclude=("examples", "docs", "tests")),

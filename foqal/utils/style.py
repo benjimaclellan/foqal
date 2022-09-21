@@ -8,7 +8,7 @@ import pathlib
 path_style = pathlib.Path(__file__).parent.joinpath(
     "fig.mplstyle"
 )  # path to the matplotlib style guide
-path_renders = pathlib.Path(__file__).parent.parent.parent.joinpath("renders")
+path_renders = pathlib.Path(__file__).parent.parent.parent.joinpath("figures/renders")
 
 
 class StyleConfig(object):
@@ -35,7 +35,7 @@ class StyleConfig(object):
         self.force_dpi = True
 
         # output settings
-        self.fig_exts = ["pdf", "png"]
+        self.fig_exts = ["pdf", ]  # "png"]
         self.save_dir = path_renders
 
         # various kw_arg style dictionaries
@@ -163,7 +163,7 @@ class StyleConfig(object):
         kwargs = {"dpi": self.dpi, "transparent": True}
         metadata = {
             "Author": "Benjamin MacLellan",
-            "Subject": "QOQI causal model selection",
+            "Subject": "causal model selection",
         }
         self.save_dir.joinpath(filename).parent.mkdir(parents=True, exist_ok=True)
 
