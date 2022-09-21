@@ -1,6 +1,6 @@
 # foqal
-Differentiable modelling for quantum theory experiments.
-Model selection experiments include causal models [1], generalized probability models [2,3], and contextual models.
+Differentiable model selection for quantum theory experiments.
+Model classes include causal models [1] and generalized probability models [2,3].
 
 ## Installation
 Install dependencies using `pip install -r requirements.txt`.
