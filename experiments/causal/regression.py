@@ -96,7 +96,7 @@ if __name__ == "__main__":
         # save intermediate results
         if i % len(ps):
             io.verbose = True
-            io.save_json(pd.DataFrame(df), filename="results/regression_summary.txt")
+            io.save_dataframe(pd.DataFrame(df), filename="results/regression_summary.txt")
             io.save_np_array(np.array(curves), filename="results/training_curves")
             io.verbose = False
 
