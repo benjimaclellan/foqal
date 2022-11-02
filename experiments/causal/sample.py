@@ -1,5 +1,7 @@
 import qutip as qt
 import numpy as np
+import ray
+import itertools
 
 from foqal.utils.io import IO
 from foqal.utils.sample import sample_bloch_vectors, bloch_vectors_to_kets
@@ -61,20 +63,28 @@ if __name__ == "__main__":
     ms = (5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140)
     ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 
-    for m in ms:
-        for p in ps:
-            state = channels["depolarized"](p=p)
-            datasets = simulate_local_projective_measurements(
-                state=state,
-                n_datasets=n_datasets,
-                m=m,
-                method="fibonnaci",
+    @ray.remote
+    def sample_data(m, p, n_datasets):
+        state = channels["depolarized"](p=p)
+        datasets = simulate_local_projective_measurements(
+            state=state,
+            n_datasets=n_datasets,
+            m=m,
+            method="fibonnaci",
+        )
+
+        for k, data in enumerate(datasets):
+            assert np.all(np.isclose(np.sum(data, axis=(0, 1)), 1.0))
+
+            io.save_np_array(
+                data.astype("float"),
+                filename=f"num_states={m}_p={int(100 * p)}_{k}",
             )
+        return
 
-            for k, data in enumerate(datasets):
-                assert np.all(np.isclose(np.sum(data, axis=(0, 1)), 1.0))
 
-                io.save_np_array(
-                    data.astype("float"),
-                    filename=f"num_states={m}_p={int(100 * p)}_{k}",
-                )
+    ray.init(ignore_reinit_error=True)
+    futures = [sample_data.remote(m, p, n_datasets) for (m, p) in itertools.product(ms, ps)]
+    ray.get(futures)
+
+    print("Complete")
