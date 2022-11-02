@@ -3,7 +3,6 @@ import itertools
 import tqdm
 import pandas as pd
 import torch
-import numpy as np
 
 from foqal import optim
 from foqal.utils.io import IO
@@ -60,22 +59,30 @@ if __name__ == "__main__":
             if Model is QuantumCommonCause:
                 _latent_dim = 2
             else:
-                _latent_dim = max([100, m])
+                _latent_dim = max([15, m])
 
-            model = Model(n_settings=m, latent_dim=_latent_dim)
-            model = model.to(device)
+            check = True
+            while check:
 
-            optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
-            loss = optim.KLDivLoss()
+                model = Model(n_settings=m, latent_dim=_latent_dim)
+                model = model.to(device)
 
-            t0 = time.time()
-            losses = fit(
-                model, train_data, optimizer, loss, n_steps=n_steps, progress=False
-            )
-            t1 = time.time()
+                optimizer = torch.optim.Adagrad(model.parameters(), lr=lr)
+                loss = optim.KLDivLoss()
 
-            loss_train = to_numpy(loss(model.forward(), train_data))
-            loss_test = to_numpy(loss(model.forward(), test_data))
+                t0 = time.time()
+                losses = fit(
+                    model, train_data, optimizer, loss, n_steps=n_steps, progress=False
+                )
+                t1 = time.time()
+
+                loss_train = to_numpy(loss(model.forward(), train_data))
+                loss_test = to_numpy(loss(model.forward(), test_data))
+
+                if (Model == QuantumCommonCause) & loss_train > 0.0002:
+                    check = True
+                else:
+                    check = False
 
             df.append(
                 dict(
@@ -97,11 +104,11 @@ if __name__ == "__main__":
         if i % len(ps):
             io.verbose = True
             io.save_dataframe(pd.DataFrame(df), filename="results/regression_summary.txt")
-            io.save_np_array(np.array(curves), filename="results/training_curves")
+            io.save_json(curves, filename="results/training_curves")
             io.verbose = False
 
     df = pd.DataFrame(df)
     io.verbose = True
     io.save_dataframe(df, filename="results/regression_summary.txt")
-    io.save_np_array(np.array(curves), filename="results/training_curves")
+    io.save_json(curves, filename="results/training_curves")
     print("Regression finished.")

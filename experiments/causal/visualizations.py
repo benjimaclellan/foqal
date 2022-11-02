@@ -26,16 +26,16 @@ def model_comparison(df: pd.DataFrame):
     }
 
     fig, axs = config.grid_axes(
-        nrows=2,
-        ncols=1,
-        width_ax=70,
-        height_ax=20,
+        nrows=1,
+        ncols=2,
+        width_ax=100,
+        height_ax=70,
         left=25,
         right=5,
         bottom=15,
         top=5,
-        width_space=0,
-        height_space=25,
+        width_space=30,
+        height_space=0,
         sharex=True,
         sharey=False,
         squeeze=True,
@@ -91,14 +91,14 @@ def model_comparison(df: pd.DataFrame):
         return itertools.chain(*[items[i::ncol] for i in range(ncol)])
 
     handles, labels = axs[0].get_legend_handles_labels()
-    leg = axs[0].legend(
+    leg = axs[1].legend(
         flip(handles, 5),
         flip(labels, 5),
         ncol=5,
         handletextpad=0.1,
         columnspacing=0.3,
         labelspacing=0.1,
-        bbox_to_anchor=(0.95, 0),
+        bbox_to_anchor=(1.05, 0.5),
         loc="center left",
     )
     leg._legend_box.align = "center"
