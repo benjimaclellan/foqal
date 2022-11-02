@@ -52,13 +52,13 @@ def simulate_local_projective_measurements(
 if __name__ == "__main__":
 
     io = IO.directory(
-        folder="local-two-qubit-measurements-depolarized-channel",
+        folder="simulated-data-causal-two-qubit-depolarizing",
         verbose=True,
         include_date=False,
         include_id=False,
     )
-    n_datasets = 5
-    ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
+    n_datasets = 2
+    ms = (5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140)
     ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 
     for m in ms:
