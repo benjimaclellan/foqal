@@ -2,6 +2,7 @@ import qutip as qt
 import numpy as np
 import ray
 import itertools
+import psutil
 
 from foqal.utils.io import IO
 from foqal.utils.sample import sample_bloch_vectors, bloch_vectors_to_kets
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         include_id=False,
     )
     n_datasets = 2
-    ms = (5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140)
+    ms = (5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200)
     ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 
     @ray.remote
@@ -83,7 +84,7 @@ if __name__ == "__main__":
         return
 
 
-    ray.init(ignore_reinit_error=True)
+    ray.init(num_cpus=psutil.cpu_count()-1, ignore_reinit_error=True)
     futures = [sample_data.remote(m, p, n_datasets) for (m, p) in itertools.product(ms, ps)]
     ray.get(futures)
 

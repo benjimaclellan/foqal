@@ -3,6 +3,7 @@ import itertools
 import tqdm
 import pandas as pd
 import torch
+import numpy as np
 
 from foqal import optim
 from foqal.utils.io import IO
@@ -21,46 +22,33 @@ if __name__ == "__main__":
     device = "cuda"
 
     io = IO.directory(
-        folder="entangled-state-data",
-        # folder="ibmq-simulator_bell-state_local-projections_depolarized-channel",
+        folder="simulated-data-causal-two-qubit-depolarizing",
         include_date=False,
         include_id=False,
         verbose=False,
     )
 
-    ps = (
-        0.0,
-        0.1,
-        0.2,
-        0.3,
-        0.4,
-        0.5,
-        0.6,
-        0.7,
-        0.8,
-        0.9,
-        1.0,
-    )
-    ms = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100)
+    ms = (5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200)
+    ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 
-    ks = (0, 1, 2, 0, 1, 2)
-    latent_dim = 100
-    lr = 0.10
-    n_steps = 2000
-
-    q = list(itertools.product(ms, ps, ks))
+    q = list(itertools.product(ms, ps))
 
     verbose, show = False, False
     df = []
-    for i in (pbar := tqdm.tqdm(range(len(q)))):
-        (m, p, k) = q[i]
-        pbar.set_description(f"m={m} | p={p} | k={k}")
+    curves = []
 
-        train_data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={p}_{k}.npy")).to(
+    for i in (pbar := tqdm.tqdm(range(len(q)))):
+        (m, p) = q[i]
+        pbar.set_description(f"m={m} | p={p}")
+
+        lr = 0.10
+        n_steps = 2000 + m * 40  # change number of steps depending on m
+
+        train_data = torch.Tensor(io.load_np_array(filename=f"num_states={m}_p={int(100 * p)}_{0}.npy")).to(
             device
         )
         test_data = torch.Tensor(
-            io.load_np_array(filename=f"m={m}_p={p}_{(k+1)%len(ks)}.npy")
+            io.load_np_array(filename=f"num_states={m}_p={int(100 * p)}_{1}.npy")
         ).to(device)
 
         for Model in [
@@ -72,7 +60,7 @@ if __name__ == "__main__":
             if Model is QuantumCommonCause:
                 _latent_dim = 2
             else:
-                _latent_dim = latent_dim
+                _latent_dim = max([100, m])
 
             model = Model(n_settings=m, latent_dim=_latent_dim)
             model = model.to(device)
@@ -98,13 +86,21 @@ if __name__ == "__main__":
                     train_loss=loss_train,
                     test_loss=loss_test,
                     kl_test_train=to_numpy(loss(train_data, test_data)),
-                    k=k,
                     t=(t1 - t0),
                     lr=lr,
                     n_steps=n_steps,
                 )
             )
+            curves.append(losses)
+
+        # save intermediate results
+        if i % len(ps):
+            io.verbose = True
+            io.save_json(pd.DataFrame(df), filename="regression_summary.txt")
+            io.verbose = False
 
     df = pd.DataFrame(df)
     io.verbose = True
     io.save_dataframe(df, filename="model_summary.txt")
+    io.save_np_array(np.array(curves), filename="training_curves")
+    print("Regression finished.")
