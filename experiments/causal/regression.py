@@ -96,11 +96,12 @@ if __name__ == "__main__":
         # save intermediate results
         if i % len(ps):
             io.verbose = True
-            io.save_json(pd.DataFrame(df), filename="regression_summary.txt")
+            io.save_json(pd.DataFrame(df), filename="results/regression_summary.txt")
+            io.save_np_array(np.array(curves), filename="results/training_curves")
             io.verbose = False
 
     df = pd.DataFrame(df)
     io.verbose = True
-    io.save_dataframe(df, filename="model_summary.txt")
-    io.save_np_array(np.array(curves), filename="training_curves")
+    io.save_dataframe(df, filename="results/regression_summary.txt")
+    io.save_np_array(np.array(curves), filename="results/training_curves")
     print("Regression finished.")
