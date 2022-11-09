@@ -31,10 +31,10 @@ def model_comparison(df: pd.DataFrame):
         width_ax=100,
         height_ax=70,
         left=25,
-        right=5,
+        right=65,
         bottom=15,
-        top=5,
-        width_space=30,
+        top=10,
+        width_space=15,
         height_space=0,
         sharex=True,
         sharey=False,
@@ -83,7 +83,7 @@ def model_comparison(df: pd.DataFrame):
             lines.append(l)
 
             axs[1].plot(ps, test, ls="--", color=cmap(scale(m)))
-    axs[0].set(ylabel="Training error")
+    axs[0].set(xlabel=r"Depolarizing coefficient, $p$", ylabel="Training error")
     axs[1].set(xlabel=r"Depolarizing coefficient, $p$", ylabel="Test error")
 
     # messing around with the legend

@@ -62,7 +62,10 @@ if __name__ == "__main__":
         include_id=False,
     )
     n_datasets = 2
-    ms = (5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200)
+    # ms = (150,)
+    ms = (160, 170, 180, 190, 200)
+    # ms = (5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200)
+    # ps = (1.0,)
     ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
     background = 1
 
@@ -87,7 +90,7 @@ if __name__ == "__main__":
         return
 
 
-    ray.init(num_cpus=24, ignore_reinit_error=True)
+    ray.init(num_cpus=7, ignore_reinit_error=True)
     futures = [sample_data.remote(m, p, n_datasets) for (m, p) in itertools.product(ms, ps)]
     ray.get(futures)
 

@@ -35,7 +35,7 @@ class StyleConfig(object):
         self.force_dpi = True
 
         # output settings
-        self.fig_exts = ["pdf", ]  # "png"]
+        self.fig_exts = ["pdf",] # "png"]
         self.save_dir = path_renders
 
         # various kw_arg style dictionaries

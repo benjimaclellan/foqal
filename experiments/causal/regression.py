@@ -28,7 +28,8 @@ if __name__ == "__main__":
     )
 
     ms = (5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200)
-    ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
+    # ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
+    ps = (0.9,)
 
     q = list(itertools.product(ms, ps))
 
@@ -43,17 +44,17 @@ if __name__ == "__main__":
         lr = 0.10
         n_steps = 2000 + m * 40  # change number of steps depending on m
 
-        train_data = torch.Tensor(io.load_np_array(filename=f"num_states={m}_p={int(100 * p)}_{0}.npy")).to(
+        train_data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={int(100 * p)}_{0}.npy")).to(
             device
         )
         test_data = torch.Tensor(
-            io.load_np_array(filename=f"num_states={m}_p={int(100 * p)}_{1}.npy")
+            io.load_np_array(filename=f"m={m}_p={int(100 * p)}_{1}.npy")
         ).to(device)
 
         for Model in [
-            ClassicalCommonCause,
-            Superdeterminism,
-            Superluminal,
+            # ClassicalCommonCause,
+            # Superdeterminism,
+            # Superluminal,
             QuantumCommonCause,
         ]:
             if Model is QuantumCommonCause:
@@ -62,6 +63,7 @@ if __name__ == "__main__":
                 _latent_dim = max([15, m])
 
             check = True
+            count = 0
             while check:
 
                 model = Model(n_settings=m, latent_dim=_latent_dim)
@@ -79,8 +81,13 @@ if __name__ == "__main__":
                 loss_train = to_numpy(loss(model.forward(), train_data))
                 loss_test = to_numpy(loss(model.forward(), test_data))
 
-                if (Model == QuantumCommonCause) & loss_train > 0.0002:
+                if (Model == QuantumCommonCause) and (loss_train > 0.0002):
+                    print("Not good enough - running again.")
                     check = True
+                    count += 1
+                    if count > 10:
+                        print(f"Not converging well")
+                        check = False
                 else:
                     check = False
 
@@ -98,17 +105,17 @@ if __name__ == "__main__":
                     n_steps=n_steps,
                 )
             )
-            curves.append(losses)
+            # curves.append(losses)
 
         # save intermediate results
-        if i % len(ps):
-            io.verbose = True
-            io.save_dataframe(pd.DataFrame(df), filename="results/regression_summary.txt")
-            io.save_json(curves, filename="results/training_curves")
-            io.verbose = False
+        # if i % len(ps):
+        #     io.verbose = True
+        #     io.save_dataframe(pd.DataFrame(df), filename="results/regression_summary-quantum.txt")
+        #     # io.save_json(curves, filename="results/training_curves")
+        #     io.verbose = False
 
     df = pd.DataFrame(df)
     io.verbose = True
-    io.save_dataframe(df, filename="results/regression_summary.txt")
-    io.save_json(curves, filename="results/training_curves")
+    io.save_dataframe(df, filename="results/regression_summary-quantum.txt")
+    # io.save_json(curves, filename="results/training_curves")
     print("Regression finished.")
