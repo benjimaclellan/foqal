@@ -27,7 +27,30 @@ if __name__ == "__main__":
         verbose=False,
     )
 
-    ms = (5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200)
+    ms = (
+        5,
+        10,
+        15,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        110,
+        120,
+        130,
+        140,
+        150,
+        160,
+        170,
+        180,
+        190,
+        200,
+    )
     # ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
     ps = (0.9,)
 
@@ -44,9 +67,9 @@ if __name__ == "__main__":
         lr = 0.10
         n_steps = 2000 + m * 40  # change number of steps depending on m
 
-        train_data = torch.Tensor(io.load_np_array(filename=f"m={m}_p={int(100 * p)}_{0}.npy")).to(
-            device
-        )
+        train_data = torch.Tensor(
+            io.load_np_array(filename=f"m={m}_p={int(100 * p)}_{0}.npy")
+        ).to(device)
         test_data = torch.Tensor(
             io.load_np_array(filename=f"m={m}_p={int(100 * p)}_{1}.npy")
         ).to(device)

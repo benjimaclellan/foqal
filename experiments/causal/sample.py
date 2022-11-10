@@ -77,7 +77,7 @@ if __name__ == "__main__":
             n_datasets=n_datasets,
             m=m,
             method="fibonnaci",
-            background=background
+            background=background,
         )
 
         for k, data in enumerate(datasets):
@@ -89,9 +89,10 @@ if __name__ == "__main__":
             )
         return
 
-
     ray.init(num_cpus=7, ignore_reinit_error=True)
-    futures = [sample_data.remote(m, p, n_datasets) for (m, p) in itertools.product(ms, ps)]
+    futures = [
+        sample_data.remote(m, p, n_datasets) for (m, p) in itertools.product(ms, ps)
+    ]
     ray.get(futures)
 
     print("Simulating data complete.")
