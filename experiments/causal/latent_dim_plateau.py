@@ -36,8 +36,6 @@ if __name__ == "__main__":
     ps = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
     ks = (5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100)
 
-    # ps = (0.0, 0.5, 1.0)  # to test
-    # ks = (5, 50, 100)
     models = (ClassicalCommonCause, Superdeterminism, Superluminal)
 
     q = list(itertools.product(ps, ks, models))
@@ -77,7 +75,7 @@ if __name__ == "__main__":
             model=model.__class__.__name__,
             m=m,
             p=p,
-            latent_dim=k,
+            latent_dim=model.latent_dim,
             train_loss=loss_train,
             test_loss=loss_test,
             kl_test_train=to_numpy(loss(train_data, test_data)),
