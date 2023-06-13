@@ -13,16 +13,16 @@
 </div>
 
 <p align="center" style="font-size:20px">
-    Differentiable model selection toolbox for testing quantum theory.
+    Differentiable model selection toolbox for generalized probability theories and quantum causal discovery.
 </p>
 
 
 ## Features
 * Toolbox for differentiable models and gradient-based optimization
-* Model selection for generalized probabilistic theories 
+* Model selection for generalized probabilistic theories
 [[1]](https://journals.aps.org/prxquantum/abstract/10.1103/PRXQuantum.2.020302),
 [[2]](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.105.032204).
-* Model selection for causal models to explain Bell-like correlations 
+* Model selection for quantum and classical causal models for Bell experiments 
 [[3]](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.105.042220).
 
 
