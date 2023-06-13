@@ -1,6 +1,3 @@
-# foqal
-
-
 <h1 align="center">
  foqal
 </h1>
